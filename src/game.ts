@@ -1,6 +1,7 @@
 import { Balance } from "./balance";
 import { Config } from "./config";
 import { Loop } from "./loop";
+import { LoopDelay } from "./loop-delay";
 import type { Producer } from "./producer";
 import { ProducerFactory } from "./producer-factory";
 import { Producers } from "./producers";
@@ -9,12 +10,13 @@ import { Revealable } from "./revealables";
 import { SafeValue } from "./safe-value";
 import { SafeValueManager } from "./safe-value-manager";
 import { Score } from "./score";
-import { ThrottledLoop } from "./throttled-loop";
+
+const RUN_EVERY = 100
+const EFFECT_EVERY = 3000
 
 export class Game {
   private __proxy?: Game;
-  private loop = new ThrottledLoop(new Loop(), 36)
-  private updateLoop = new ThrottledLoop(new Loop(), 3000)
+  private loop = new Loop()
   private config = new Config()
   private score = new Score()
   private producerFactory = new ProducerFactory(this.config.priceMultiplier)
@@ -140,13 +142,12 @@ export class Game {
       )
     })
 
-    game.loop.add(game.onLoop.bind(game))
-    game.loop.start()
-
     this.revealables.process(game, true)
     this.calculateEPS(game)
-    game.updateLoop.add(this.onUpdate.bind(game))
-    game.updateLoop.start()
+
+    game.loop.add(LoopDelay.create(game.onLoop.bind(game), RUN_EVERY).callback)
+    game.loop.add(LoopDelay.create(game.onUpdate.bind(game), EFFECT_EVERY).callback)
+    game.loop.start()
   }
 
   work() {
@@ -192,12 +193,10 @@ export class Game {
 
   pause() {
     this.loop.stop()
-    this.updateLoop.stop()
   }
 
   resume() {
     this.loop.start()
-    this.updateLoop.start()
   }
 
   get displayManualLaborValue() {
