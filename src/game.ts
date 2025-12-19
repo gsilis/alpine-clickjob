@@ -9,11 +9,12 @@ import { Revealable } from "./revealables";
 import { SafeValue } from "./safe-value";
 import { SafeValueManager } from "./safe-value-manager";
 import { Score } from "./score";
+import { ThrottledLoop } from "./throttled-loop";
 
 export class Game {
   private __proxy?: Game;
-  private loop = new Loop()
-  private updateLoop = new Loop()
+  private loop = new ThrottledLoop(new Loop(), 36)
+  private updateLoop = new ThrottledLoop(new Loop(), 3000)
   private config = new Config()
   private score = new Score()
   private producerFactory = new ProducerFactory(this.config.priceMultiplier)

@@ -1,6 +1,6 @@
-type LoopRegistrant = (diff: number) => void;
+import type { Loopable, LoopRegistrant } from "./loopable";
 
-export class Loop {
+export class Loop implements Loopable {
   private running: boolean = false;
   private lastRun: number = 0;
   private listeners: LoopRegistrant[] = [];
