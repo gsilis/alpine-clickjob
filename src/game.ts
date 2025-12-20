@@ -5,149 +5,66 @@ import { LoopDelay } from "./loop-delay";
 import type { Producer } from "./producer";
 import { ProducerFactory } from "./producer-factory";
 import { Producers } from "./producers";
-import { Progression } from "./progression";
-import { Revealable } from "./revealables";
 import { SafeValue } from "./safe-value";
+import { SafeValueFactory } from "./safe-value-factory";
 import { SafeValueManager } from "./safe-value-manager";
 import { Score } from "./score";
+import { Unlocks, type Unlock } from "./unlocks";
 
-const RUN_EVERY = 100
-const EFFECT_EVERY = 3000
+// How often the update loop should run
+const RUN_EVERY = 100// ms
+// How often checks for effects should be run
+const EFFECT_EVERY = 3000// ms
+
+export type Product = { id: string, title: string, description: string, basePrice: number, baseProductivity: number }
+export type Upgrade = { id: string, title: string, description: string, effectDescription: string, price: number, unlockAt: number, productId: string }
 
 export class Game {
   private __proxy?: Game;
   private loop = new Loop()
   private config = new Config()
   private score = new Score()
-  private producerFactory = new ProducerFactory(this.config.priceMultiplier)
-  private producers = new Producers(this.producerFactory.create('null', 'Null', 0, 0))
-  private upgrades = new Producers(this.producerFactory.create('null', 'Null', 0, 0))
   private manualLabor: SafeValue<number> = new SafeValue('game.manual-labor', 1, parseFloat)
   private balances = new Balance()
-  private revealables = new Revealable()
+  private unlockStorage = SafeValueFactory.stringCollection('game.unlocks', [])
+  private unlocks = new Unlocks(this.unlockStorage)
+  private producerFactory = new ProducerFactory(this.config.priceMultiplier)
+  private producers = new Producers(this.producerFactory.create('null', 'NULL', 0, 0))
+  private upgrades = []
+  private frameClicks: number = 0
+
+  constructor(products: Product[], upgrades: Upgrade[], unlocks: Unlock[]) {
+    products.forEach((product) => {
+      this.producers.add(this.producerFactory.create(
+        product.id,
+        product.title,
+        product.basePrice,
+        product.baseProductivity
+      ))
+    })
+
+    upgrades.forEach((upgrade) => {
+      
+    })
+
+    unlocks.forEach((unlock) => {
+      this.unlocks.register(unlock)
+    })
+  }
 
   /**
    * This accepts the proxied game object from Alpine, otherwise any updates we do to the data objects won't get picked up by the UI
    */
   setup(game: Game) {
+    if (window.DEBUG) console.group('Setting up')
     this.__proxy = game
-
-    const producerUpgrades: {
-      name: string,
-      title: string,
-      basePriceMultiplier: number,
-      productivity: number,
-      minQuantity: number
-    }[] = [
-      { name: 'bronze', title: 'Bronze ', basePriceMultiplier: 100, productivity: 2, minQuantity: 25 },
-      { name: 'silver', title: 'Silver ', basePriceMultiplier: 1000, productivity: 2, minQuantity: 50 },
-      { name: 'gold', title: 'Gold ', basePriceMultiplier: 20000, productivity: 2, minQuantity: 100 },
-      { name: 'iridium', title: 'Iridium ', basePriceMultiplier: 31000, productivity: 5, minQuantity: 250 },
-      { name: 'beryllium', title: 'Beryllium ', basePriceMultiplier: 500000, productivity: 10, minQuantity: 500 },
-    ]
-    const producerConfig: {
-      name: string,
-      title: string,
-      basePrice: number,
-      baseProductivity: number
-    }[] = [
-      { name: 'macro', title: 'Macro', basePrice: 20, baseProductivity: 0.1 },
-      { name: 'ad-platform', title: 'Ad Platforms', basePrice: 200, baseProductivity: 1 },
-      { name: 'irresistable-button', title: 'Irresistable Button', basePrice: 1200, baseProductivity: 5 },
-      { name: 'scroll-wheel', title: 'Scroll Wheel', basePrice: 15000, baseProductivity: 8 }
-    ]
-
-    producerConfig.forEach(({ name, title, basePrice, baseProductivity }) => {
-      const producer = game.producerFactory.create(name, title, basePrice, baseProductivity)
-      game.producers.add(producer)
-      /**
-       * Even though we have a handle for 'producer' in the loop, it is not the proxied version
-       */
-      game.revealables.add(
-        `${name}-reveal`,
-        (game) => game.balances.maxBalance >= producer.revealAt,
-        (game) => {
-          game.producers.find(producer.name).revealed = true
-        },
-        (game) => {},
-      )
-      game.revealables.add(
-        `${name}-available`,
-        (game) => game.balances.maxBalance >= producer.availableAt,
-        (game) => {
-          game.producers.find(producer.name).available = true
-        },
-        (game) => {},
-      )
-
-      producerUpgrades.forEach((config) => {
-        const price = basePrice * config.basePriceMultiplier
-        const upgradeName = `${name}-${config.name}`
-        const upgrade = game.producerFactory.create(
-          upgradeName,
-          `${config.title}${title}`,
-          price,
-          config.productivity
-        )
-        game.upgrades.add(upgrade)
-        game.revealables.add(
-          upgradeName,
-          (_) => {
-            return producer.quantity >= config.minQuantity
-          },
-          (game) => {
-            const u = game.upgrades.find(upgrade.name)
-            u.revealed = u.available = true
-          },
-          (game) => {
-            const u = game.upgrades.find(upgrade.name)
-            producer.productivity *= upgrade.productivity
-          },
-          true
-        )
-      })
-    })
-
-    const manualPrices = new Progression(50000, 1.15)
-    const manualMins = new Progression(5000, 1.25)
-    const manualClicks: { name: string, title: string, baseProductivity: number }[] = [
-      { name: 'coffee', title: 'Drink Coffee', baseProductivity: 1.01 },
-      { name: 'broken-mouse', title: 'Broken Mouse', baseProductivity: 1.01 },
-      { name: 'espresso', title: 'Espresso', baseProductivity: 1.02 },
-      { name: 'double-espresso', title: 'Double Espresso', baseProductivity: 1.02 },
-      { name: 'click-collider', title: 'Large Click Collider', baseProductivity: 1.02 },
-      { name: 'rtfm', title: 'Read the Manual', baseProductivity: 1.02 },
-      { name: 'gpus', title: 'GPU Rendering', baseProductivity: 1.03 }
-    ]
-    manualClicks.forEach(({ name, title, baseProductivity }) => {
-      const upgrade = game.producerFactory.create(name, title, manualPrices.next(), baseProductivity)
-      const minClicks = manualMins.next()
-
-      game.upgrades.add(upgrade)
-      game.revealables.add(name,
-        (game) => {
-          return game.balances.maxBalance >= minClicks
-        },
-        (game) => {
-          const u = game.upgrades.find(upgrade.name)
-          u.revealed = u.available = true
-        },
-        (game) => {
-          const u = game.upgrades.find(upgrade.name)
-          u.available = false
-          console.log(`APPLYING UPGRADE ${u.name} -> +${u.productivity}`)
-          game.manualLabor.value *= u.productivity
-        },
-        true
-      )
-    })
-
-    this.revealables.process(game, true)
     this.calculateEPS(game)
+    this.unlocks.process(game, game.producers, game.balances)
 
     game.loop.add(LoopDelay.create(game.onLoop.bind(game), RUN_EVERY).callback)
     game.loop.add(LoopDelay.create(game.onUpdate.bind(game), EFFECT_EVERY).callback)
     game.loop.start()
+    if (window.DEBUG) console.groupEnd()
   }
 
   work() {
@@ -155,6 +72,7 @@ export class Game {
 
     this.score.record('manual', amount)
     this.balances.earn(amount)
+    this.frameClicks += 1
   }
 
   buy(game: Game, producer: Producer, quantity: number) {
@@ -176,12 +94,12 @@ export class Game {
 
   buyUpgrade(game: Game, upgrade: Producer) {
     const price = upgrade.price
-    const application = game.revealables.findApplicationFor(upgrade.name)
+    // const application = game.revealables.findApplicationFor(upgrade.name)
     if (price > game.balances.balance) return
     game.balances.spend(price)
     upgrade.available = false
 
-    if (application) application.call(undefined, game)
+    // if (application) application.call(undefined, game)
 
     this.calculateEPS(game)
   }
@@ -199,16 +117,36 @@ export class Game {
     this.loop.start()
   }
 
+  restart() {
+    this.pause()
+    this.erase()
+  }
+
   get displayManualLaborValue() {
-    return this.manualLabor.value.toFixed(2)
+    return this.manualLabor.value.toFixed(1)
+  }
+
+  get balance() {
+    return this.balances.balance
+  }
+
+  get maxBalance() {
+    return this.balances.maxBalance
   }
 
   get proxy() {
     return this.__proxy
   }
 
+  debug() {
+    window.DEBUG = !window.DEBUG
+    return window.DEBUG ? 'Debug ON' : 'Debug OFF'
+  }
+
   private calculateEPS(game: Game) {
+    if (window.DEBUG) console.group('Calculating EPS...')
     game.producers.recalculate()
+    if (window.DEBUG) console.groupEnd()
   }
 
   private onLoop(time: number) {
@@ -218,7 +156,30 @@ export class Game {
     this.balances.earn(amount)
   }
 
-  private onUpdate(_time: number) {
-    this.revealables.process(this)
+  private onUpdate(time: number) {
+    const lastFrame = this.frameClicks
+    this.frameClicks = 0
+    if (window.DEBUG) {
+      console.group(`Game update frame after ${time}ms`)
+      console.log(...this.outputClickEvents(lastFrame))
+    }
+    this.unlocks.process(this, this.producers, this.balances)
+    if (window.DEBUG) console.groupEnd()
+  }
+
+  private outputClickEvents(count: number): string[] {
+    const messages: string[] = []
+
+    if (count > 0) {
+      messages.push(
+        `%c${count}%c click events`,
+        'background-color: purple; color: white; padding: 2px 4px',
+        'background-color: none; padding: auto'
+      )
+    } else {
+      messages.push('0 click events')
+    }
+
+    return messages
   }
 }

@@ -50,6 +50,8 @@ export class Producers {
       const eps = producer.quantity * producer.productivity
       this._epsStats[producer.name] = eps
       this._epmsStats[producer.name] = eps * THOUSANDTH
+
+      if (window.DEBUG) console.log(`${producer.name} -> ${eps} (${this._epmsStats[producer.name]} / ms)`)
     })
 
     this.overallProductivity = Object.values(this._epsStats).reduce((sum, val) => sum + val, 0)

@@ -4,4 +4,5 @@ import type { Game } from './game'
 declare global {
   var Alpine: AlpineType
   var game: Game
+  var DEBUG: boolean
 }
