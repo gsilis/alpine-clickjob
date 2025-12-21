@@ -10,7 +10,7 @@ const PRODUCTS: Product[] = [
   {
     id: 'macro', title: 'Macros',
     basePrice: 15,
-    baseProductivity: 0.1,
+    baseProductivity: 5,
     description: `
       Run a macro to click the button for you.
     `,

@@ -1,3 +1,4 @@
+import { Multipliers } from "./multipliers"
 import { SafeValue } from "./safe-value"
 
 export class Producer {
@@ -6,11 +7,10 @@ export class Producer {
   private _title: string
   private _basePrice: number
   private _quantity: SafeValue<number>
-  private _productivityPerSecond: SafeValue<number>
+  private _productivity: number
   private _revealed: SafeValue<number>
   private _available: SafeValue<number>
-  private _revealAt: number
-  private _availableAt: number
+  private _multipliers: Multipliers
 
   constructor(
     priceMultiplier: SafeValue<number>,
@@ -23,12 +23,11 @@ export class Producer {
     this._name = name
     this._title = title
     this._basePrice = basePrice
+    this._productivity = defaultProductivityPerSecond
     this._quantity = new SafeValue(`${name}.quantity`, 0, parseInt)
-    this._productivityPerSecond = new SafeValue(`${name}.productivity`, defaultProductivityPerSecond, parseFloat)
     this._revealed = new SafeValue(`${name}.revealed`, 0, parseInt)
     this._available = new SafeValue(`${name}.available`, 0, parseInt)
-    this._revealAt = Math.round(this._basePrice * 0.75)
-    this._availableAt = Math.round(this._basePrice * 0.98)
+    this._multipliers = new Multipliers()
   }
 
   get name(): string {
@@ -72,11 +71,11 @@ export class Producer {
   }
 
   get productivity(): number {
-    return this._productivityPerSecond.value
+    return this._productivity
   }
 
   set productivity(value: number) {
-    this._productivityPerSecond.value = value
+    this._productivity = value
   }
 
   get price(): number {
@@ -85,14 +84,6 @@ export class Producer {
 
   get displayPrice(): number {
     return Math.ceil(this.price)
-  }
-
-  get revealAt(): number {
-    return this._revealAt
-  }
-
-  get availableAt(): number {
-    return this._availableAt
   }
 
   buyPriceFor(quantity: number): number {

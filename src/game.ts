@@ -5,6 +5,7 @@ import { LoopDelay } from "./loop-delay";
 import type { Producer } from "./producer";
 import { ProducerFactory } from "./producer-factory";
 import { Producers } from "./producers";
+import { Purchases } from "./purchases";
 import { SafeValue } from "./safe-value";
 import { SafeValueFactory } from "./safe-value-factory";
 import { SafeValueManager } from "./safe-value-manager";
@@ -30,7 +31,8 @@ export class Game {
   private unlocks = new Unlocks(this.unlockStorage)
   private producerFactory = new ProducerFactory(this.config.priceMultiplier)
   private producers = new Producers(this.producerFactory.create('null', 'NULL', 0, 0))
-  private upgrades = []
+  private upgrades: Upgrade[] = []
+  private purchases = new Purchases(SafeValueFactory.stringCollection('game.purchases', []))
   private frameClicks: number = 0
 
   constructor(products: Product[], upgrades: Upgrade[], unlocks: Unlock[]) {
@@ -44,7 +46,7 @@ export class Game {
     })
 
     upgrades.forEach((upgrade) => {
-      
+      this.upgrades.push(upgrade)
     })
 
     unlocks.forEach((unlock) => {
