@@ -1,5 +1,6 @@
-import { SafeValue } from "./safe-value";
+import { SafeValueFactory } from "./safe-value-factory";
 
 export class Config {
-  priceMultiplier = new SafeValue('game.price-multiplier', 1.15, s => s)
+  priceMultiplier = SafeValueFactory.numeric('game.price-multiplier', 1.15)
+  sellPercentage = SafeValueFactory.numeric('game.sell-percentage', 0.3)
 }

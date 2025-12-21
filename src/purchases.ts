@@ -1,14 +1,18 @@
 import type { SafeValue } from "./safe-value";
 
 export class Purchases {
-  private ids: SafeValue<string[]>
+  private _ids: SafeValue<string[]>
 
   constructor(safeValue: SafeValue<string[]>) {
-    this.ids = safeValue
+    this._ids = safeValue
   }
 
   add(id: string) {
-    const existingIds = this.ids.value
-    if (!existingIds.includes(id)) this.ids.value = [...existingIds, id]
+    const existingIds = this._ids.value
+    if (!existingIds.includes(id)) this._ids.value = [...existingIds, id]
+  }
+
+  ids(): string[] {
+    return [...this._ids.value]
   }
 }

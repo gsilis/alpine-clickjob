@@ -1,10 +1,10 @@
 import type { Balance } from "./balance";
-import type { Game } from "./game";
+import type { Game, StoredUpgrade } from "./game";
 import type { Producers } from "./producers";
 import type { SafeValue } from "./safe-value";
 
-export type UnlockGameStateProcessor = (game: Game, producers: Producers, balance: Balance) => number
-export type UnlockInstaller = (game: Game, producers: Producers, balance: Balance) => void
+export type UnlockGameStateProcessor = (game: Game, producers: Producers, upgrades: StoredUpgrade[], balance: Balance) => number
+export type UnlockInstaller = (game: Game, producers: Producers, upgrades: StoredUpgrade[], balance: Balance) => void
 
 export interface Unlock {
   id: string,
@@ -14,8 +14,8 @@ export interface Unlock {
   price: number,
   // 0 = hidden, 1 = available, 2 = applied
   state: number,
-  getStateFrom(game: Game, producers: Producers, balance: Balance): number,
-  install(game: Game, producers: Producers, balance: Balance): void,
+  getStateFrom(game: Game, producers: Producers, upgrades: StoredUpgrade[], balance: Balance): number,
+  install(game: Game, producers: Producers, upgrades: StoredUpgrade[], balance: Balance): void,
   get available(): boolean,
   get installed(): boolean,
 }
@@ -57,14 +57,14 @@ export class Unlocks {
     return this._unlocks.find(u => u.id === id)
   }
 
-  process(game: Game, producers: Producers, balance: Balance) {
+  process(game: Game, producers: Producers, upgrades: StoredUpgrade[], balance: Balance) {
     if (window.DEBUG) console.group(`Unlock Processing at balance = ${balance.balance}, maxBalance = ${balance.maxBalance}`)
     const removals: Unlock[] = []
 
     this._pending.forEach(unlock => {
-      unlock.state = unlock.getStateFrom(game, producers, balance)
+      unlock.state = unlock.getStateFrom(game, producers, upgrades, balance)
       if (unlock.available) {
-        unlock.install(game, producers, balance)
+        unlock.install(game, producers, upgrades, balance)
         removals.push(unlock)
       }
     })

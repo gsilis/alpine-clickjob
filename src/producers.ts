@@ -1,3 +1,4 @@
+import type { Game } from "./game";
 import type { Producer } from "./producer";
 
 const THOUSANDTH = 1 / 1000
@@ -45,8 +46,9 @@ export class Producers {
     this._earnedStats[producer.name] = 0
   }
   
-  recalculate() {
+  recalculate(game: Game) {
     this.producers.forEach((producer) => {
+      producer.calculate(game, this)
       const eps = producer.quantity * producer.productivity
       this._epsStats[producer.name] = eps
       this._epmsStats[producer.name] = eps * THOUSANDTH

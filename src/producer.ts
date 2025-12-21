@@ -1,29 +1,36 @@
+import type { Game } from "./game"
 import { Multipliers } from "./multipliers"
+import type { Producers } from "./producers"
 import { SafeValue } from "./safe-value"
 
 export class Producer {
   private _priceMultiplier: SafeValue<number>
+  private _sellPercentage: SafeValue<number>
   private _name: string
   private _title: string
   private _basePrice: number
   private _quantity: SafeValue<number>
   private _productivity: number
+  private _cachedProductivity: number
   private _revealed: SafeValue<number>
   private _available: SafeValue<number>
   private _multipliers: Multipliers
 
   constructor(
     priceMultiplier: SafeValue<number>,
+    sellPercentage: SafeValue<number>,
     name: string,
     title: string,
     basePrice: number,
     defaultProductivityPerSecond: number
   ) {
     this._priceMultiplier = priceMultiplier
+    this._sellPercentage = sellPercentage
     this._name = name
     this._title = title
     this._basePrice = basePrice
     this._productivity = defaultProductivityPerSecond
+    this._cachedProductivity = this._productivity
     this._quantity = new SafeValue(`${name}.quantity`, 0, parseInt)
     this._revealed = new SafeValue(`${name}.revealed`, 0, parseInt)
     this._available = new SafeValue(`${name}.available`, 0, parseInt)
@@ -71,11 +78,7 @@ export class Producer {
   }
 
   get productivity(): number {
-    return this._productivity
-  }
-
-  set productivity(value: number) {
-    this._productivity = value
+    return this._cachedProductivity
   }
 
   get price(): number {
@@ -84,6 +87,16 @@ export class Producer {
 
   get displayPrice(): number {
     return Math.ceil(this.price)
+  }
+
+  boost(name: string, amount: number) {
+    this._multipliers.add(name, (_game, _producers, value) => value * amount)
+  }
+
+  calculate(game: Game, producers: Producers) {
+    const boosts = this._multipliers.calculate(game, producers, this._productivity)
+    this._cachedProductivity = boosts.total
+    if (window.DEBUG) console.log(`EPS ${this.name}: base ${this._productivity} + ${JSON.stringify(boosts)} from ${this._multipliers.len} multipliers`)
   }
 
   buyPriceFor(quantity: number): number {
@@ -106,6 +119,6 @@ export class Producer {
       prices.push(this._basePrice * multiplier)
     }
 
-    return prices.reduce((sum, val) => sum + val, 0) * 0.3
+    return prices.reduce((sum, val) => sum + val, 0) * this._sellPercentage.value
   }
 }

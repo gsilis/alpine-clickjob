@@ -4,13 +4,14 @@ import './style.css'
 import Alpine from 'alpinejs'
 import { UnlockFactory } from './unlock-factory'
 import { UnlockStateFactory } from './unlock-state-factory'
-import type { Unlock } from './unlocks'
+import type { Unlock, UnlockGameStateProcessor } from './unlocks'
+import type { Producers } from './producers'
 
 const PRODUCTS: Product[] = [
   {
     id: 'macro', title: 'Macros',
     basePrice: 15,
-    baseProductivity: 5,
+    baseProductivity: 0.1,
     description: `
       Run a macro to click the button for you.
     `,
@@ -60,28 +61,28 @@ const PRODUCTS: Product[] = [
 const UPGRADES: Upgrade[] = [
   // These are based on quantity of each product
   ...(PRODUCTS.reduce<Upgrade[]>((acc: Upgrade[], product: Product) => {
-    const unlockProgression = new Progression(10, 1.8)
-    const priceProgression = new Progression(10, 1.5)
+    const unlockProgression = new Progression(15, 1.9)
+    const priceProgression = new Progression(100, 2)
     const levels: {
       id: string,
       title: string,
       boost: number,
       description: string,
     }[] = [
-      { id: 'paper', title: 'Paper', boost: 2, description: 'Paper mache {P} are faster!' },
-      { id: 'plastic', title: 'Plastic', boost: 2, description: 'New and improved waterproof† {P} made out of plastic. †Not guaranteed to be waterproof.' },
-      { id: 'steel', title: 'Steel', boost: 2, description: 'Cold hard steel {P}. They yield to nobody.' },
-      { id: 'copper', title: 'Copper', boost: 2, description: 'Good enough for plumbing, good enough for {P}.' },
-      { id: 'bronze', title: 'Bronze', boost: 2, description: 'A new age for {P}! They also look very substantial.' },
-      { id: 'silver', title: 'Silver', boost: 2.5, description: 'Make nice and shiny {P}.' },
-      { id: 'gold', title: 'Gold', boost: 2.5, description: 'We can now make our {P} even heavier! Other than that, this serves no other real purpose.' },
-      { id: 'platinum', title: 'Platinum', boost: 3, description: `To the untrained eye, this looks just like silver. But if you have to explain it to everyone anyways, what does it matter if the {P} are made out of platinum?` },
-      { id: 'palladium', title: 'Palladium', boost: 3, description: `We're not saying that these {P} are made out of stolen catalytic converters, but where else are you going to find palladium?` },
-      { id: 'iridium', title: 'Iridium', boost: 3, description: 'This metal makes it into a lot of games, right? Why should our {P} be any different?' },
-      { id: 'beryllium', title: 'Beryllium', boost: 3, description: `I'll be honest, I've never even seen Beryllium. But it's on the periodic table, so in theory you can make {P} out of it.` },
-      { id: 'rainbow', title: 'Rainbow', boost: 3.5, description: `You have to look at the {P} just after a rain storm, but if you catch the light just right, it's amazing.` },
-      { id: 'quantum', title: 'Quantum', boost: 3.5, description: `You're only licensed to one Quantum {P} at any given time.` },
-      { id: 'subspace', title: 'Subspace', boost: 3.5, description: 'Taken right out of the warp core, might want to let this {P} cool a bit before touching it.' },
+      { id: 'paper', title: 'Paper', boost: 1, description: 'Paper mache {P} are faster!' },
+      { id: 'plastic', title: 'Plastic', boost: 1, description: 'New and improved waterproof† {P} made out of plastic. †Not guaranteed to be waterproof.' },
+      { id: 'steel', title: 'Steel', boost: 1, description: 'Cold hard steel {P}. They yield to nobody.' },
+      { id: 'copper', title: 'Copper', boost: 1, description: 'Good enough for plumbing, good enough for {P}.' },
+      { id: 'bronze', title: 'Bronze', boost: 1, description: 'A new age for {P}! They also look very substantial.' },
+      { id: 'silver', title: 'Silver', boost: 1.5, description: 'Make nice and shiny {P}.' },
+      { id: 'gold', title: 'Gold', boost: 1.5, description: 'We can now make our {P} even heavier! Other than that, this serves no other real purpose.' },
+      { id: 'platinum', title: 'Platinum', boost: 1.75, description: `To the untrained eye, this looks just like silver. But if you have to explain it to everyone anyways, what does it matter if the {P} are made out of platinum?` },
+      { id: 'palladium', title: 'Palladium', boost: 1.75, description: `We're not saying that these {P} are made out of stolen catalytic converters, but where else are you going to find palladium?` },
+      { id: 'iridium', title: 'Iridium', boost: 1.75, description: 'This metal makes it into a lot of games, right? Why should our {P} be any different?' },
+      { id: 'beryllium', title: 'Beryllium', boost: 1.75, description: `I'll be honest, I've never even seen Beryllium. But it's on the periodic table, so in theory you can make {P} out of it.` },
+      { id: 'rainbow', title: 'Rainbow', boost: 2, description: `You have to look at the {P} just after a rain storm, but if you catch the light just right, it's amazing.` },
+      { id: 'quantum', title: 'Quantum', boost: 2, description: `You're only licensed to one Quantum {P} at any given time.` },
+      { id: 'subspace', title: 'Subspace', boost: 2, description: 'Taken right out of the warp core, might want to let this {P} cool a bit before touching it.' },
       { id: 'godlike', title: 'Godlike', boost: 5, description: `Did you just hear the {P} say something? It can't talk, right?` }
     ]
     const levelsToUpgrades = levels.map<Upgrade>(({ id, title, boost, description }) => {
@@ -91,13 +92,29 @@ const UPGRADES: Upgrade[] = [
         title: `${title} ${product.title}`,
         description: description.replace(/\{P\}/gi, product.title),
         effectDescription: `Increase the output of ${product.title} by ${boost * 100}%`,
-        price: priceProgression.next(),
-        unlockAt: unlockProgression.next()
+        price: product.basePrice * priceProgression.next(),
+        unlockAt: unlockProgression.next(),
+        install: (_game: Game, producers: Producers) => {
+          producers.find(product.id).boost('normal', boost)
+        }
       }
     })
 
     return [...acc, ...levelsToUpgrades]
-  }, []))
+  }, [])),
+  {
+    id: 'turbo-mouse', title: 'Turbo Mouse',
+    description: `Install a sick turbo on your computer mouse.`,
+    effectDescription: `Gain 1EPS for every 3 macros you own.`,
+    price: 5000,
+    unlockAt: 10000,
+    install: (game: Game, _producers: Producers) => {
+      game.addManualLaborMultiplier('turbo-mouse', (_game: Game, producers: Producers) => {
+        const macros = Math.floor(producers.find('macro').quantity / 3)
+        return macros
+      })
+    }
+  }
 ]
 
 const unlockProductProgression = new Progression(10, 4)
@@ -121,12 +138,19 @@ const UNLOCKS: Unlock[] = [
     ]
   }, [])),
   ...(UPGRADES.reduce<Unlock[]>((acc, upgrade) => {
+    let processor: UnlockGameStateProcessor
+
+    if (upgrade.productId) {
+      processor = unlockStateFactory.createProductCountWatcher(upgrade.productId, upgrade.unlockAt)
+    } else {
+      processor = unlockStateFactory.createMaxScoreWatcher(upgrade.id, upgrade.unlockAt)
+    }
     return [
       ...acc,
       unlockFactory.createAutomatic(
         `show-${upgrade.id}`,
-        unlockStateFactory.createProductCountWatcher(upgrade.productId, upgrade.unlockAt),
-        unlockStateFactory.DEBUGLOGGER(upgrade)
+        processor,
+        unlockStateFactory.createUpgradeAvailabler(upgrade.id)
       )
     ]
   }, [])),
@@ -164,10 +188,11 @@ document.querySelector<HTMLDivElement>('#app')!.innerHTML = `
         </section>
       </template>
       <h1>Upgrades</h1>
-      <template x-for="upgrade in upgrades.producers">
+      <template x-for="upgrade in upgrades">
         <section x-data="upgrade" x-show="upgrade.available">
-          <p x-text="title"></p>
-          <p>Price: <span x-text="displayPrice"></span></p>
+          <p x-text="title" x-bind:title="description"></p>
+          <p>Price: <span x-text="price"></span></p>
+          <p x-text="effectDescription"></p>
           <button @click="buyUpgrade($store.game, upgrade)">Buy</button>
         </section>
       </template>
