@@ -86,8 +86,9 @@ const UPGRADES: Upgrade[] = [
       { id: 'godlike', title: 'Godlike', boost: 5, description: `Did you just hear the {P} say something? It can't talk, right?` }
     ]
     const levelsToUpgrades = levels.map<Upgrade>(({ id, title, boost, description }) => {
+      const compId = `${id}-${product.id}`
       return {
-        id: `${id}-${product.id}`,
+        id: compId,
         productId: product.id,
         title: `${title} ${product.title}`,
         description: description.replace(/\{P\}/gi, product.title),
@@ -95,7 +96,7 @@ const UPGRADES: Upgrade[] = [
         price: product.basePrice * priceProgression.next(),
         unlockAt: unlockProgression.next(),
         install: (_game: Game, producers: Producers) => {
-          producers.find(product.id).boost('normal', boost)
+          producers.find(product.id).boost(compId, boost)
         }
       }
     })
@@ -158,7 +159,7 @@ const UNLOCKS: Unlock[] = [
 
 const game = new Game(PRODUCTS, UPGRADES, UNLOCKS)
 
-window.DEBUG = true
+window.DEBUG = false
 window.Alpine = Alpine
 window.game = game
 Alpine.start()
