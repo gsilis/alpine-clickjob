@@ -1,1 +1,74 @@
-@import "tailwindcss"
+@import "tailwindcss";
+
+html {
+  --outline-blue: #1134b7;
+  --secondary-dark-blue: #040c30;
+  --tertiary-dark-blue: #091a69;
+  --dark-blue-1: #1a1975;
+  --dark-blue: #060532;
+  --light-blue: #3d9aff;
+  --light-gray: #f2f2f2;
+  --border-color: #1134b7;
+
+  --bg-gradient-from: #020618;
+  --bg-gradient-to: #0f172b;
+
+  --blue-text: #4468c2;
+  --green-text: #8cc63f;
+  --red-text: #ed1c24;
+}
+
+button#work {
+  --button-color: var(--light-blue);
+  background: linear-gradient(to bottom, var(--dark-blue) 0%, var(--button-color) 71%);
+  box-shadow: inset 0 15px 10px rgba(0, 0, 0, 0.37), inset 0 0 10px rgba(0, 0, 0, 0.9);
+  padding: 50px;
+  border-radius: 100em;
+  position: relative;
+  line-height: 0;
+  transition: all 1s ease-in-out;
+  cursor: pointer;
+}
+
+button#work:after {
+  content: "";
+  position: absolute;
+  top: 7%;
+  left: 0%;
+  width: 100%;
+  height: 93%;
+  background: linear-gradient(to bottom, rgba(255, 255, 255, 0.3) 5%, rgba(255, 255, 255, 0) 60%);
+  border-radius: 100em;
+}
+
+button#work span {
+  position: absolute;
+  font-size: 60px;
+  line-height: 60px;
+  top: 20px;
+  left: 20px;
+}
+
+button#work:hover {
+  --button-color: #63aeff;
+}
+
+button#work:active {
+  --button-color: #1988ff;
+}
+
+.backgrounded {
+  background: linear-gradient(to top, var(--bg-gradient-from), var(--bg-gradient-to));
+}
+
+.reverse-backgrounded {
+  background: linear-gradient(to top, var(--bg-gradient-to), var(--bg-gradient-from));
+}
+
+.balance-box, .store-box {
+  border-bottom: 1px solid var(--border-color);
+}
+
+.quantity {
+  color: var(--blue-text);
+}

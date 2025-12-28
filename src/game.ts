@@ -17,10 +17,11 @@ import { Unlocks, type Unlock } from "./unlocks";
 const RUN_EVERY = 100// ms
 // How often checks for effects should be run
 const EFFECT_EVERY = 3000// ms
+const priceFormatter = new Intl.NumberFormat('en-us', { maximumFractionDigits: 0 })
 
 export type Product = { id: string, title: string, description: string, basePrice: number, baseProductivity: number }
 export type Upgrade = { id: string, title: string, description: string, effectDescription: string, price: number, unlockAt: number, productId?: string, install(game: Game, producers: Producers): void }
-export type StoredUpgrade = Upgrade & { available: boolean }
+export type StoredUpgrade = Upgrade & { available: boolean, displayPrice: string }
 
 export class Game {
   private __proxy?: Game;
@@ -49,7 +50,7 @@ export class Game {
     })
 
     upgrades.forEach((upgrade) => {
-      this.upgrades.push({ ...upgrade, available: false })
+      this.upgrades.push({ ...upgrade, available: false, displayPrice: priceFormatter.format(upgrade.price) })
     })
 
     unlocks.forEach((unlock) => {

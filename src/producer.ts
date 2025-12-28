@@ -4,6 +4,7 @@ import type { Producers } from "./producers"
 import { SafeValue } from "./safe-value"
 
 export class Producer {
+  private priceFormatter = new Intl.NumberFormat('en-us', { maximumFractionDigits: 0 });
   private _priceMultiplier: SafeValue<number>
   private _sellPercentage: SafeValue<number>
   private _name: string
@@ -86,7 +87,7 @@ export class Producer {
   }
 
   get displayPrice(): number {
-    return Math.ceil(this.price)
+    return this.priceFormatter.format(Math.ceil(this.price))
   }
 
   boost(name: string, amount: number) {

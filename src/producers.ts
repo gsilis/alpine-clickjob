@@ -2,6 +2,7 @@ import type { Game } from "./game";
 import type { Producer } from "./producer";
 
 const THOUSANDTH = 1 / 1000
+const formatter = new Intl.NumberFormat('en-us', { maximumFractionDigits: 1 })
 
 export class Producers {
   private _null: Producer
@@ -36,7 +37,7 @@ export class Producers {
   }
 
   get displayOverallProductivity() {
-    return this.overallProductivity.toFixed(1)
+    return formatter.format(this.overallProductivity)
   }
 
   add(producer: Producer) {

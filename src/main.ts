@@ -167,34 +167,47 @@ Alpine.start()
 Alpine.store('game', window.game)
 
 document.querySelector<HTMLDivElement>('#app')!.innerHTML = `
-  <main x-data="$store.game" x-init="setup($store.game)">
-    <h1 x-text="balances.displayBalance"></h1>
-    <p>All Time = <span x-text="balances.displayMaxBalance"></span></p>
-    <p>EPS: <span x-text="producers.displayOverallProductivity"></span></p>
-    <p>Manual EPC: <span x-text="displayManualLaborValue"></span></p>
-    <button @click="work()">Work</button>
-    <hr />
-    <div class="flex flex-col">
+  <main x-data="$store.game" x-init="setup($store.game)" class="grid grid-cols-[auto] grid-rows-[3] h-screen">
+    <section class="flex-[0_100px] backgrounded px-3 py-8 row-1 balance-box">
+      <h1 x-text="balances.displayBalance" class="font-mono text-2xl text-white text-center my-2"></h1>
+      <p class="text-center text-white">
+        <span x-text="producers.displayOverallProductivity"></span>
+        <span class="text-[10px] align-top">EPS</span>
+      </p>
+    </section>
+    <section class="manual-box reverse-backgrounded row-3 flex justify-center items-center">
+      <button @click="work()" id="work"><span>🙂</span></button>
+    </section>
+    <div class="flex flex-col backgrounded grid-row-2 store-box overflow-scroll text-white">
       <h1>Producers</h1>
-      <template x-for="producer in producers.producers">
-        <section x-data="producer" x-show="producer.revealed">
-          <p x-text="quantity"></p>
-          <p>
-            <span x-show="mysterious">????</span>
-            <span x-show="available" x-text="title"></span>
-          </p>
-          <p x-text="displayPrice"></p>
-          <button @click="buy($store.game, producer, 1)">Buy</button>
-          <button @click="sell($store.game, producer, 1)">Sell</button>
-        </section>
-      </template>
+      <div class="flex flex-col">
+        <template x-for="producer in producers.producers">
+          <section x-data="producer" x-show="producer.revealed" class="grid grid-rows-3 grid-cols-[50px_1fr_50px_50px]">
+            <div class="w-[50px] h-[50px] row-1 col-1 row-span-3"></div>
+            <p class="row-1 col-2 quantity">
+              <span x-text="quantity"></span>
+              <span>Owned</span>
+            </p>
+            <p class="row-2 col-2 text-white">
+              <span x-show="mysterious">????</span>
+              <span x-show="available" x-text="title"></span>
+            </p>
+            <p class="row-3 col-2 price text-xl">
+              <span x-text="displayPrice"></span>
+            </p>
+            <button @click="buy($store.game, producer, 1)" class="col-3 row-1 row-span-3 w-[50px] h-[50px]">Buy</button>
+            <button @click="sell($store.game, producer, 1)" class="col-4 row-1 row-span-3 w-[50px] h-[50px]">Sell</button>
+          </section>
+        </template>
+      </div>
       <h1>Upgrades</h1>
       <template x-for="upgrade in upgrades">
-        <section x-data="upgrade" x-show="upgrade.available">
-          <p x-text="title" x-bind:title="description"></p>
-          <p>Price: <span x-text="price"></span></p>
-          <p x-text="effectDescription"></p>
-          <button @click="buyUpgrade($store.game, upgrade)">Buy</button>
+        <section x-data="upgrade" x-show="upgrade.available" class="grid grid-rows-3 grid-cols-[50px_1fr_50px]">
+          <div class="w-[50px] h-[50px] row-1 col-1 row-span-3"></div>
+          <p x-text="title" x-bind:title="description" class="row-1 col-2"></p>
+          <p class="row-2 col-2 text-xl"><span x-text="displayPrice"></span></p>
+          <p class="row-3 col-2" x-text="effectDescription"></p>
+          <button class="row-1 col-3 row-span-3" @click="buyUpgrade($store.game, upgrade)">Buy</button>
         </section>
       </template>
     </div>

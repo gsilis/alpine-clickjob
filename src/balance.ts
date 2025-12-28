@@ -1,5 +1,7 @@
 import { SafeValue } from "./safe-value"
 
+const formatter = new Intl.NumberFormat('en-us', { style: 'decimal', maximumFractionDigits: 0 })
+
 export class Balance {
   private _balance = new SafeValue('game.balance', 0, parseFloat)
   private _maxBalance = new SafeValue('game.maxBalance', 0, parseFloat)
@@ -16,7 +18,7 @@ export class Balance {
   }
 
   get displayBalance() {
-    return this.balance.toFixed(1)
+    return formatter.format(this.balance)
   }
 
   get balance() {
