@@ -36,6 +36,7 @@ button#work {
   line-height: 0;
   transition: all 1s ease-in-out;
   cursor: pointer;
+  touch-action: none;
 }
 
 button#work:after {
