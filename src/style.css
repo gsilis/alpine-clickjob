@@ -36,7 +36,6 @@ button#work {
   line-height: 0;
   transition: all 1s ease-in-out;
   cursor: pointer;
-  touch-action: none;
 }
 
 button#work:after {
@@ -134,4 +133,22 @@ button#work:active {
 
 .store-modes button:last-child {
   border-right: none;
+}
+
+.no-touch {
+  touch-action: none;
+  user-select: none;
+}
+
+.no-select {
+  user-select: none;
+}
+
+button:disabled {
+  opacity: 0.5;
+}
+
+.store-mode {
+  color: var(--blue-text);
+  border: 1px solid var(--blue-text);
 }

@@ -25,7 +25,11 @@ export type StoredUpgrade = Upgrade & { available: boolean, displayPrice: string
 
 export const MODE_PURCHASES = 'purchases'
 export const MODE_UPGRADES = 'upgrades'
-type StoreMode = (typeof MODE_PURCHASES | typeof MODE_UPGRADES)
+export const MODE_HISTORY = 'history'
+type StoreMode = (typeof MODE_PURCHASES | typeof MODE_UPGRADES | typeof MODE_HISTORY)
+export const STORE_MODE_BUY = 'store-buy'
+export const STORE_MODE_SELL = 'store-sell'
+type StoreTransactionMode = (typeof STORE_MODE_BUY | typeof STORE_MODE_SELL)
 
 export class Game {
   private __proxy?: Game;
@@ -43,6 +47,7 @@ export class Game {
   private purchases = new Purchases(SafeValueFactory.stringCollection('game.purchases', []))
   private frameClicks: number = 0
   private _storeMode: StoreMode = MODE_PURCHASES
+  private _storeTransactMode: StoreTransactionMode = STORE_MODE_BUY
 
   constructor(products: Product[], upgrades: Upgrade[], unlocks: Unlock[]) {
     products.forEach((product) => {
@@ -167,6 +172,14 @@ export class Game {
 
   set storeMode(mode: StoreMode) {
     this._storeMode = mode
+  }
+
+  get storeTransactMode() {
+    return this._storeTransactMode
+  }
+
+  set storeTransactMode(mode: StoreTransactionMode) {
+    this._storeTransactMode = mode
   }
 
   debug() {
