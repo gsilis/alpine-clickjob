@@ -167,49 +167,56 @@ Alpine.start()
 Alpine.store('game', window.game)
 
 document.querySelector<HTMLDivElement>('#app')!.innerHTML = `
-  <main x-data="$store.game" x-init="setup($store.game)" class="grid grid-cols-[auto] grid-rows-[3] h-screen">
-    <section class="flex-[0_100px] backgrounded px-3 py-8 row-1 balance-box">
+  <main x-data="$store.game" x-init="setup($store.game)" class="grid grid-cols-[auto] grid-rows-[200px_auto_70px_150px] h-screen">
+    <section class="flex-[0_100px] backgrounded px-3 py-8 row-1 balance-box blue-bottom">
       <h1 x-text="balances.displayBalance" class="font-mono text-2xl text-white text-center my-2"></h1>
       <p class="text-center text-white">
         <span x-text="producers.displayOverallProductivity"></span>
         <span class="text-[10px] align-top">EPS</span>
       </p>
     </section>
-    <section class="manual-box reverse-backgrounded row-3 flex justify-center items-center">
+    <section class="manual-box reverse-backgrounded row-4 flex justify-center items-center">
       <button @click="work()" id="work"><span>🙂</span></button>
     </section>
-    <div class="flex flex-col backgrounded grid-row-2 store-box overflow-scroll text-white">
-      <h1>Producers</h1>
-      <div class="flex flex-col">
+    <section class="flex flex-row reverse-backgrounded row-3 col-1 store-modes">
+      <button class="flex-1 text-sky-400 cursor-pointer" :class="{'active': storeMode === 'purchases'}" @click="storeMode = 'purchases'">Producers</button>
+      <button class="flex-1 text-sky-400 cursor-pointer" :class="{'active': storeMode === 'upgrades'}" @click="storeMode = 'upgrades'">
+        Upgrades
+        <span x-text="availableUpgrades" x-show="availableUpgrades > 0" class="ml-2 text-white bg-red-500 px-2 py-1 rounded-xl font-bold"></span>
+      </button>
+    </section>
+    <div class="flex flex-col backgrounded grid-row-2 store-box overflow-scroll text-white row-2">
+      <div class="flex flex-col" x-show="storeMode === 'purchases'">
         <template x-for="producer in producers.producers">
-          <section x-data="producer" x-show="producer.revealed" class="grid grid-rows-3 grid-cols-[50px_1fr_50px_50px]">
-            <div class="w-[50px] h-[50px] row-1 col-1 row-span-3"></div>
-            <p class="row-1 col-2 quantity">
+          <section x-data="producer" x-show="producer.revealed" class="grid grid-rows-3 grid-cols-[50px_1fr_50px_50px] my-2 px-3 gap-x-4 gap-y-0" :class="{ 'unavailable-item' : price > balance }">
+            <div class="w-[50px] h-[50px] row-1 col-1 row-span-4 border-3 rounded-xl border-amber-500"></div>
+            <p class="row-1 col-2 text-white">
+              <span x-show="mysterious">????</span>
+              <span x-show="available" x-text="title" class="text-nowrap text-ellipsis"></span>
+            </p>
+            <p class="row-2 col-2 quantity">
               <span x-text="quantity"></span>
               <span>Owned</span>
             </p>
-            <p class="row-2 col-2 text-white">
-              <span x-show="mysterious">????</span>
-              <span x-show="available" x-text="title"></span>
-            </p>
-            <p class="row-3 col-2 price text-xl">
+            <p class="row-3 col-2 price text-xl" :class="{ 'available': price <= balance, 'unavailable': price > balance }">
               <span x-text="displayPrice"></span>
             </p>
-            <button @click="buy($store.game, producer, 1)" class="col-3 row-1 row-span-3 w-[50px] h-[50px]">Buy</button>
-            <button @click="sell($store.game, producer, 1)" class="col-4 row-1 row-span-3 w-[50px] h-[50px]">Sell</button>
+            <button @click="buy($store.game, producer, 1)" class="col-3 row-1 row-span-3 w-[50px] h-[50px] rounded-[10em] buy-button text-2xl cursor-pointer">🛒</button>
+            <button @click="sell($store.game, producer, 1)" class="col-4 row-1 row-span-3 w-[50px] h-[50px] rounded-[10em] sell-button text-2xl cursor-pointer">💰</button>
           </section>
         </template>
       </div>
-      <h1>Upgrades</h1>
-      <template x-for="upgrade in upgrades">
-        <section x-data="upgrade" x-show="upgrade.available" class="grid grid-rows-3 grid-cols-[50px_1fr_50px]">
-          <div class="w-[50px] h-[50px] row-1 col-1 row-span-3"></div>
-          <p x-text="title" x-bind:title="description" class="row-1 col-2"></p>
-          <p class="row-2 col-2 text-xl"><span x-text="displayPrice"></span></p>
-          <p class="row-3 col-2" x-text="effectDescription"></p>
-          <button class="row-1 col-3 row-span-3" @click="buyUpgrade($store.game, upgrade)">Buy</button>
-        </section>
-      </template>
+      <div class="flex flex-col backgrounded grid-row-2 store-box overflow-scroll text-white row-2" x-show="storeMode === 'upgrades'">
+        <template x-for="upgrade in upgrades">
+          <section x-data="upgrade" x-show="upgrade.available" class="grid grid-rows-3 grid-cols-[50px_1fr_50px] my-2 px-3 gap-x-4 gap-y-0">
+            <div class="w-[50px] h-[50px] row-1 col-1 row-span-4 border-3 rounded-xl border-amber-500"></div>
+            <p x-text="title" x-bind:title="description" class="row-1 col-2"></p>
+            <p class="row-2 col-2 text-xl" :class="{ 'available': price <= balance, 'unavailable': price > balance }"><span x-text="displayPrice"></span></p>
+            <p class="row-3 col-2" x-text="effectDescription"></p>
+            <button @click="buyUpgrade($store.game, upgrade)" class="col-3 row-1 row-span-3 w-[50px] h-[50px] rounded-[10em] buy-button text-2xl cursor-pointer">🛒</button>
+          </section>
+        </template>
+      </div>
     </div>
   </main>
 `

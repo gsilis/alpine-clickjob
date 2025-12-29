@@ -16,6 +16,14 @@ html {
   --blue-text: #4468c2;
   --green-text: #8cc63f;
   --red-text: #ed1c24;
+
+  --buy-from: #006837;
+  --buy-to: #004022;
+
+  --sell-from: var(--color-orange-400);
+  --sell-to: var(--color-orange-500);
+
+  background: var(--bg-gradient-from);
 }
 
 button#work {
@@ -65,10 +73,64 @@ button#work:active {
   background: linear-gradient(to top, var(--bg-gradient-to), var(--bg-gradient-from));
 }
 
-.balance-box, .store-box {
+.blue-bottom {
   border-bottom: 1px solid var(--border-color);
+}
+
+.blue-top {
+  border-top: 1px solid var(--border-color);
+}
+
+.blue-left {
+  border-left: 1px solid var(--border-color);
+}
+
+.blue-right {
+  border-right: 1px solid var(--border-color);
 }
 
 .quantity {
   color: var(--blue-text);
+}
+
+.available {
+  color: var(--green-text);
+}
+
+.unavailable {
+  color: var(--red-text);
+}
+
+.unavailable-item {
+  opacity: 0.6;
+}
+
+.buy-button {
+  background: linear-gradient(var(--buy-from), var(--buy-to));
+}
+
+.sell-button {
+  background: linear-gradient(var(--sell-from), var(--sell-to));
+}
+
+.store-modes button {
+  border-top: 1px solid var(--border-color);
+  border-left: 1px solid var(--border-color);
+  border-right: 1px solid var(--border-color);
+  border-bottom: none;
+}
+
+.store-modes button.active {
+  border-bottom: 1px solid var(--border-color);
+  border-left: 1px solid var(--border-color);
+  border-right: 1px solid var(--border-color);
+  border-top: none;
+}
+
+.store-modes button:first-child {
+  border-left: none;
+}
+
+.store-modes button:last-child {
+  border-right: none;
 }

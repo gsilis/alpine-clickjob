@@ -23,6 +23,10 @@ export type Product = { id: string, title: string, description: string, basePric
 export type Upgrade = { id: string, title: string, description: string, effectDescription: string, price: number, unlockAt: number, productId?: string, install(game: Game, producers: Producers): void }
 export type StoredUpgrade = Upgrade & { available: boolean, displayPrice: string }
 
+export const MODE_PURCHASES = 'purchases'
+export const MODE_UPGRADES = 'upgrades'
+type StoreMode = (typeof MODE_PURCHASES | typeof MODE_UPGRADES)
+
 export class Game {
   private __proxy?: Game;
   private loop = new Loop()
@@ -38,6 +42,7 @@ export class Game {
   private upgrades: StoredUpgrade[] = []
   private purchases = new Purchases(SafeValueFactory.stringCollection('game.purchases', []))
   private frameClicks: number = 0
+  private _storeMode: StoreMode = MODE_PURCHASES
 
   constructor(products: Product[], upgrades: Upgrade[], unlocks: Unlock[]) {
     products.forEach((product) => {
@@ -150,6 +155,18 @@ export class Game {
 
   get proxy() {
     return this.__proxy
+  }
+
+  get availableUpgrades() {
+    return this.upgrades.filter(u => u.available).length
+  }
+
+  get storeMode() {
+    return this._storeMode
+  }
+
+  set storeMode(mode: StoreMode) {
+    this._storeMode = mode
   }
 
   debug() {

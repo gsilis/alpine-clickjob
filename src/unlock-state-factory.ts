@@ -5,8 +5,8 @@ import type { Producers } from "./producers";
 import type { UnlockGameStateProcessor, UnlockInstaller } from "./unlocks";
 
 export class UnlockStateFactory {
-  createMaxScoreWatcher(name: string, minScore: number): UnlockGameStateProcessor {
-    return (_game: Game, _producers: Producers, upgrades: StoredUpgrade[], balance: Balance) => {
+  createMaxScoreWatcher(_name: string, minScore: number): UnlockGameStateProcessor {
+    return (_game: Game, _producers: Producers, _upgrades: StoredUpgrade[], balance: Balance) => {
       const score = balance.maxBalance
 
       return score >= minScore ? 1 : 0
@@ -14,7 +14,7 @@ export class UnlockStateFactory {
   }
 
   createProductCountWatcher(productId: string, quantity: number): UnlockGameStateProcessor {
-    return (_game: Game, producers: Producers, upgrades: StoredUpgrade[], _balance: Balance) => {
+    return (_game: Game, producers: Producers, _upgrades: StoredUpgrade[], _balance: Balance) => {
       const product = producers.find(productId)
       let state = 0
       if (product && product.quantity >= quantity) state = 1
@@ -23,7 +23,7 @@ export class UnlockStateFactory {
   }
 
   createRevealer(productId: string): UnlockInstaller {
-    return (_game: Game, producers: Producers, upgrades: StoredUpgrade[], _balance: Balance) => {
+    return (_game: Game, producers: Producers, _upgrades: StoredUpgrade[], _balance: Balance) => {
       if (window.DEBUG) {
         console.log(
           `%cUNLOCK%c %creveal%c %c${productId}`,
@@ -42,7 +42,7 @@ export class UnlockStateFactory {
   }
 
   createAvailabler(productId: string): UnlockInstaller {
-    return (_game: Game, producers: Producers, upgrades: StoredUpgrade[], _balance: Balance) => {
+    return (_game: Game, producers: Producers, _upgrades: StoredUpgrade[], _balance: Balance) => {
       if (window.DEBUG) {
         console.log(
           `%cUNLOCK%c %cavailable product%c %c${productId}`,

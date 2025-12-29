@@ -86,7 +86,7 @@ export class Producer {
     return this._basePrice * Math.pow(this._priceMultiplier.value, this._quantity.value)
   }
 
-  get displayPrice(): number {
+  get displayPrice(): string {
     return this.priceFormatter.format(Math.ceil(this.price))
   }
 
