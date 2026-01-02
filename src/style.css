@@ -172,4 +172,8 @@ button:disabled {
   .store-modes button.active {
     border-bottom: none;
   }
+
+  .md-blue-top {
+    border-top: 1px solid var(--border-color);
+  }
 }

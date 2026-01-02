@@ -1,6 +1,7 @@
 import { Balance } from "./balance";
 import { Config } from "./config";
 import { Console } from "./console";
+import { Display } from "./display";
 import { Loop } from "./loop";
 import { LoopDelay } from "./loop-delay";
 import { Multipliers, type MultiplierFunction } from "./multipliers";
@@ -42,12 +43,13 @@ export class Game {
   private unlockStorage = SafeValueFactory.stringCollection('game.unlocks', [])
   private unlocks = new Unlocks(this.unlockStorage)
   private producerFactory = new ProducerFactory(this.config.priceMultiplier, this.config.sellPercentage)
-  private producers = new Producers(this.producerFactory.create('null', 'NULL', 0, 0))
+  private producers = new Producers(this.producerFactory.create('null', 'NULL', 0, 0), this.score)
   private upgrades: StoredUpgrade[] = []
   private purchases = new Purchases(SafeValueFactory.stringCollection('game.purchases', []))
   private frameClicks: number = 0
   private _storeMode: StoreMode = MODE_PURCHASES
   private _storeTransactMode: StoreTransactionMode = STORE_MODE_BUY
+  display = new Display()
 
   constructor(products: Product[], upgrades: Upgrade[], unlocks: Unlock[]) {
     products.forEach((product) => {

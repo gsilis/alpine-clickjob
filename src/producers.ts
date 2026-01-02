@@ -1,11 +1,13 @@
 import type { Game } from "./game";
 import type { Producer } from "./producer";
+import type { Score } from "./score";
 
 const THOUSANDTH = 1 / 1000
 const formatter = new Intl.NumberFormat('en-us', { maximumFractionDigits: 1 })
 
 export class Producers {
   private _null: Producer
+  private _score: Score
   private _overallProductivityPerSecond: number
   private _overallProductivityPerSecondMS: number
   private _epmsStats: Record<string, number> = {}
@@ -13,10 +15,11 @@ export class Producers {
   private _earnedStats: Record<string, number> = {}
   private producers: Producer[] = []
 
-  constructor(nullProducer: Producer) {
+  constructor(nullProducer: Producer, score: Score) {
     this._null = nullProducer
     this._overallProductivityPerSecond = 0
     this._overallProductivityPerSecondMS = 0
+    this._score = score
   }
 
   all() {
@@ -40,6 +43,14 @@ export class Producers {
     return formatter.format(this.overallProductivity)
   }
 
+  get availableProducers() {
+    return this.producers.filter(p => p.available)
+  }
+
+  get hasAvailableProducers() {
+    return this.availableProducers.length > 0
+  }
+
   add(producer: Producer) {
     this.producers.push(producer)
     this._epsStats[producer.name] = 0
@@ -61,8 +72,10 @@ export class Producers {
   }
 
   advance(byTime: number) {
-    Object.keys(this.producers).forEach(name => {
-      this._earnedStats[name] += (this._epmsStats[name] * byTime)
+    Object.keys(this._epmsStats).forEach(name => {
+      const amount = (this._epmsStats[name] * byTime)
+      this._earnedStats[name] += amount
+      this._score.record(name, amount)
     })
   }
 

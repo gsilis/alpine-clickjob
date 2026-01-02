@@ -23,7 +23,11 @@ export class Score {
     const current = this._categories.value
     this._categories.value = {
       ...current,
-      [name]: current[name] + amount
+      [name]: (current[name] || 0) + amount
     }
+  }
+
+  scoreFor(name: string) {
+    return this._categories.value[name] || 0
   }
 }
