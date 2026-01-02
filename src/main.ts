@@ -167,36 +167,44 @@ Alpine.start()
 Alpine.store('game', window.game)
 
 document.querySelector<HTMLDivElement>('#app')!.innerHTML = `
-  <main x-data="$store.game" x-init="setup($store.game)" class="grid grid-cols-[auto] grid-rows-[160px_auto_70px_150px] h-screen no-select">
-    <section class="flex-[0_100px] backgrounded px-3 py-8 row-1 balance-box blue-bottom">
+  <main x-data="$store.game" x-init="setup($store.game)" class="grid grid-cols-[auto] grid-rows-[160px_auto_70px_150px] h-screen no-select md:grid-cols-[400px_1fr] md:grid-rows-[150px_50px_1fr_150px]">
+    <section class="flex-[0_100px] backgrounded px-3 py-8 row-1 balance-box blue-bottom md:col-span-2 md:row-1">
       <h1 x-text="balances.displayBalance" class="font-mono text-[30px] text-white text-center my-2"></h1>
       <p class="text-center text-white">
         <span x-text="producers.displayOverallProductivity"></span>
         <span class="text-[10px] align-top">EPS</span>
       </p>
     </section>
-    <section class="manual-box reverse-backgrounded row-4 flex justify-center items-center">
+    <section class="manual-box reverse-backgrounded row-4 flex justify-center items-center md:row-4 md:col-span-2">
       <button @click="work()" id="work"><span>🙂</span></button>
     </section>
-    <section class="flex flex-row reverse-backgrounded row-3 col-1 store-modes">
-      <button class="flex-1 text-sky-400 cursor-pointer no-touch" :class="{'active': storeMode === 'purchases'}" @click="storeMode = 'purchases'">
+    <section class="flex flex-row reverse-backgrounded row-3 col-1 store-modes md:row-2 md:col-1 md:col-span-3">
+      <div class="hidden md:flex md:flex-[0_400px] blue-bottom flex-row text-xs text-white flex-1 gap-4 items-center">
+        <p class="flex-1">Total%</p>
+        <p class="flex-1">Total</p>
+        <p class="flex-1">EPS</p>
+      </div>
+      <button class="flex-1 md:flex-0 md:px-4 text-sky-400 cursor-pointer no-touch" :class="{'active': storeMode === 'purchases'}" @click="storeMode = 'purchases'">
         Producers
       </button>
-      <button class="flex-1 text-sky-400 cursor-pointer no-touch" :class="{'active': storeMode === 'upgrades'}" @click="storeMode = 'upgrades'">
+      <button class="flex-1 md:flex-0 md:px-4 text-sky-400 cursor-pointer no-touch" :class="{'active': storeMode === 'upgrades'}" @click="storeMode = 'upgrades'">
         Upgrades
         <span x-text="availableUpgrades" x-show="availableUpgrades > 0" class="ml-2 text-white bg-red-500 px-2 py-1 rounded-xl font-bold"></span>
       </button>
-      <button class="flex-1 text-sky-400 cursot-pointer no-touch" :class="{'active': storeMode === 'history'}" @click="storeMode = 'history'">
+      <button class="flex-1 text-sky-400 cursot-pointer no-touch md:hidden" :class="{'active': storeMode === 'history'}" @click="storeMode = 'history'">
         Stats
       </button>
     </section>
-    <div class="flex flex-col backgrounded grid-row-2 store-box overflow-scroll text-white row-2">
-      <div class="flex flex-row p-3 gap-4" x-show="storeMode === 'purchases'">
-        <h1 class="uppercase flex-1">Products</h1>
-        <button class="uppercase flex-[0_50px] cursor-pointer store-mode" x-bind:disabled="storeTransactMode === 'store-buy'" @click="storeTransactMode = 'store-buy'">Buy</button>
-        <button class="uppercase flex-[0_50px] cursor-pointer store-mode" x-bind:disabled="storeTransactMode === 'store-sell'" @click="storeTransactMode = 'store-sell'">Sell</button>
+    <div class="flex flex-col backgrounded grid-row-2 store-box overflow-scroll text-white row-2 md:row-3 md:col-1 md:col-span-3 md:grid md:grid-rows-[80px_1fr] md:grid-cols-[400px_1fr]">
+      <div class="flex flex-col backgrounded grid-row-2 store-box text-white row-2 md:row-2 md:col-1 md:flex-[400px_0] show-mobile md:row-span-2 md:col-1" :class="{'active':storeMode === 'history'}">
+        Stats
       </div>
-      <div class="flex flex-col" x-show="storeMode === 'purchases'">
+      <div class="flex flex-row p-3 gap-4 md:row-1 md:col-2" x-show="storeMode === 'purchases'">
+        <h1 class="uppercase flex-1">Products</h1>
+        <button class="uppercase flex-[0_50px] cursor-pointer store-mode p-2" x-bind:disabled="storeTransactMode === 'store-buy'" @click="storeTransactMode = 'store-buy'">Buy</button>
+        <button class="uppercase flex-[0_50px] cursor-pointer store-mode p-2" x-bind:disabled="storeTransactMode === 'store-sell'" @click="storeTransactMode = 'store-sell'">Sell</button>
+      </div>
+      <div class="flex flex-col md:row-2 md:col-2" x-show="storeMode === 'purchases'">
         <template x-for="producer in producers.producers">
           <section x-data="producer" x-show="producer.revealed" class="grid grid-rows-3 grid-cols-[50px_1fr_50px_50px] my-2 px-3 gap-x-4 gap-y-0" :class="{ 'unavailable-item' : price > balance }">
             <div class="w-[50px] h-[50px] row-1 col-1 row-span-4 border-3 rounded-xl border-amber-500"></div>
@@ -216,7 +224,7 @@ document.querySelector<HTMLDivElement>('#app')!.innerHTML = `
           </section>
         </template>
       </div>
-      <div class="flex flex-col grid-row-2 store-box overflow-scroll text-white row-2" x-show="storeMode === 'upgrades'">
+      <div class="flex flex-col store-box overflow-scroll text-white row-2 md:row-1 md:row-span-2 md:col-2" x-show="storeMode === 'upgrades'">
         <p x-show="availableUpgrades <= 0" class="p-3">
           No upgrades available yet.
         </p>
@@ -229,9 +237,6 @@ document.querySelector<HTMLDivElement>('#app')!.innerHTML = `
             <button @click="buyUpgrade($store.game, upgrade)" class="col-3 row-1 row-span-4 align-center w-[50px] h-[50px] rounded-[10em] buy-button text-2xl cursor-pointer no-touch">🛒</button>
           </section>
         </template>
-      </div>
-      <div class="flex flex-col backgrounded grid-row-2 store-box overflow-scroll text-white row-2" x-show="storeMode === 'history'">
-        
       </div>
     </div>
   </main>

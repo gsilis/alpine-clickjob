@@ -152,3 +152,24 @@ button:disabled {
   color: var(--blue-text);
   border: 1px solid var(--blue-text);
 }
+
+@media screen and (max-width: 763px) {
+  .show-mobile {
+    display: none;
+  }
+
+  .show-mobile.active {
+    display: inherit;
+  }
+}
+
+@media screen and (min-width: 763px) {
+  .store-modes button {
+    border-top: none;
+    border-bottom: 1px solid var(--border-color);
+  }
+
+  .store-modes button.active {
+    border-bottom: none;
+  }
+}
