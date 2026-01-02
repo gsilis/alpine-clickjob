@@ -66,6 +66,10 @@ export class Display {
     return `${display} ${name}`
   }
 
+  percentFor(value: number) {
+    return `${formatter.format(100 * value)}%`
+  }
+
   private offsetFor(num: number): number {
     let offset = undefined
     let current = NUMBERS.length - 1
@@ -75,7 +79,6 @@ export class Display {
       const value = num / divider
 
       if (value > 1) {
-        console.log(name, num, current)
         offset = current
       }
 

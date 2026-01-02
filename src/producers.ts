@@ -82,4 +82,8 @@ export class Producers {
   find(name: string): Producer {
     return this.producers.find(p => p.name === name) || this._null
   }
+
+  epsFor(name: string): number {
+    return this._epsStats[name] || 0
+  }
 }

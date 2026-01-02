@@ -201,9 +201,9 @@ document.querySelector<HTMLDivElement>('#app')!.innerHTML = `
         <template x-for="producer in producers.availableProducers">
           <div class="flex flex-row gap-2 w-full px-3 py-2 border-b-1 border-sky-950 text-sm">
             <p class="flex-[0_25px] h-[25px] border-3 rounded-sm border-amber-500"></p>
-            <p class="flex-1 text-left">1%</p>
+            <p class="flex-1 text-left" x-text="display.percentFor(score.percentageFor(score.scoreFor(producer.name), balances.maxBalance))"></p>
             <p class="flex-1 text-right font-mono" x-text="display.humanAbbreviatedNumber(score.scoreFor(producer.name))"></p>
-            <p class="flex-1 text-right">1%</p>
+            <p class="flex-1 text-right" x-text="display.humanAbbreviatedNumber(producers.epsFor(producer.name))"></p>
           </div>
         </template>
       </div>

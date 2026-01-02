@@ -30,4 +30,8 @@ export class Score {
   scoreFor(name: string) {
     return this._categories.value[name] || 0
   }
+
+  percentageFor(score: number, total: number) {
+    return score / total
+  }
 }
