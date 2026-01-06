@@ -12,6 +12,7 @@ import { Purchases } from "./purchases";
 import { SafeValueFactory } from "./safe-value-factory";
 import { SafeValueManager } from "./safe-value-manager";
 import { Score } from "./score";
+import { Smileys } from "./smileys";
 import { Unlocks, type Unlock } from "./unlocks";
 
 // How often the update loop should run
@@ -49,6 +50,7 @@ export class Game {
   private frameClicks: number = 0
   private _storeMode: StoreMode = MODE_PURCHASES
   private _storeTransactMode: StoreTransactionMode = STORE_MODE_BUY
+  private _smileys: Smileys = new Smileys()
   display = new Display()
 
   constructor(products: Product[], upgrades: Upgrade[], unlocks: Unlock[]) {
@@ -146,6 +148,10 @@ export class Game {
   restart() {
     this.pause()
     this.erase()
+  }
+
+  get smileys() {
+    return this._smileys
   }
 
   get displayManualLaborValue() {

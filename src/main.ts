@@ -6,11 +6,13 @@ import { UnlockFactory } from './unlock-factory'
 import { UnlockStateFactory } from './unlock-state-factory'
 import type { Unlock, UnlockGameStateProcessor } from './unlocks'
 import type { Producers } from './producers'
+import { SMILEYS } from './smileys'
 
+const productPriceProgression = new Progression(15, 11)
 const PRODUCTS: Product[] = [
   {
     id: 'macro', title: 'Macros',
-    basePrice: 15,
+    basePrice: productPriceProgression.next(),
     baseProductivity: 0.1,
     description: `
       Run a macro to click the button for you.
@@ -18,7 +20,7 @@ const PRODUCTS: Product[] = [
    },
    {
     id: 'scroll-wheel', title: 'Scroll Wheels',
-    basePrice: 100,
+    basePrice: productPriceProgression.next(),
     baseProductivity: 1,
     description: `
       You've bound your mouse wheel rotations to a left click using a program you downloaded from Totally Legitemate Corp™.
@@ -26,7 +28,7 @@ const PRODUCTS: Product[] = [
    },
    {
     id: 'extra-hand', title: 'Extra Hands',
-    basePrice: 1000,
+    basePrice: productPriceProgression.next(),
     baseProductivity: 3,
     description: `
       Click using both arms. Of course you need to invest in a new kind of mouse to do this, that's why it's so expensive.
@@ -34,7 +36,7 @@ const PRODUCTS: Product[] = [
    },
    {
     id: 'ad-platform-server', title: 'Ad Platform Servers',
-    basePrice: 5300,
+    basePrice: productPriceProgression.next(),
     baseProductivity: 50,
     description: `
       Why click on the button yourself? You've created an ad platform that directs other peoples' clicks to your button.
@@ -42,7 +44,7 @@ const PRODUCTS: Product[] = [
   },
   {
     id: 'foot-pedal', title: 'Foot Pedals',
-    basePrice: 10000,
+    basePrice: productPriceProgression.next(),
     baseProductivity: 125,
     description: `
       Don't let your other limbs go to waste, let them generate clicks too! Having learned your lessons from Ambidexterity, this is a set of two pedals, rather than just one.
@@ -50,7 +52,7 @@ const PRODUCTS: Product[] = [
   },
   {
     id: 'metronome', title: 'Metronomes',
-    basePrice: 20000,
+    basePrice: productPriceProgression.next(),
     baseProductivity: 230,
     description: `
       Swings back and forth to click the button.
@@ -58,6 +60,7 @@ const PRODUCTS: Product[] = [
   }
 ]
 
+const smileyPriceProgression = new Progression(1000000, 2)
 const UPGRADES: Upgrade[] = [
   // These are based on quantity of each product
   ...(PRODUCTS.reduce<Upgrade[]>((acc: Upgrade[], product: Product) => {
@@ -103,6 +106,25 @@ const UPGRADES: Upgrade[] = [
 
     return [...acc, ...levelsToUpgrades]
   }, [])),
+  ...(SMILEYS.reduce<Upgrade[]>((acc, smiley) => {
+    const price = smileyPriceProgression.next()
+
+    return [
+      ...acc,
+      {
+        id: smiley.id,
+        title: smiley.title,
+        description: `Produce ${smiley.title} emojis`,
+        effectDescription: `Increase production by ${smiley.rate * 100}%`,
+        price: price,
+        unlockAt: price * 0.9,
+        install: (game: Game, producers: Producers) => {
+          game.smileys.unlock(smiley.id)
+          producers.increase(smiley.id, smiley.rate)
+        }
+      }
+    ]
+  }, [])),
   {
     id: 'turbo-mouse', title: 'Turbo Mouse',
     description: `Install a sick turbo on your computer mouse.`,
@@ -120,6 +142,7 @@ const UPGRADES: Upgrade[] = [
 
 const unlockProductProgression = new Progression(10, 4)
 const availableProductProgression = new Progression(12, 4)
+const smileyProgression = new Progression(100000, 2)
 const unlockFactory = new UnlockFactory()
 const unlockStateFactory = new UnlockStateFactory()
 const UNLOCKS: Unlock[] = [
@@ -155,6 +178,16 @@ const UNLOCKS: Unlock[] = [
       )
     ]
   }, [])),
+  ...(SMILEYS.reduce<Unlock[]>((acc, smiley) => {
+    return [
+      ...acc,
+      unlockFactory.createAutomatic(
+        `show-${smiley.id}`,
+        unlockStateFactory.createMaxScoreWatcher(smiley.id, smileyProgression.next()),
+        unlockStateFactory.createUpgradeAvailabler(smiley.id)
+      )
+    ]
+  }, []))
 ]
 
 const game = new Game(PRODUCTS, UPGRADES, UNLOCKS)
@@ -167,18 +200,19 @@ Alpine.start()
 Alpine.store('game', window.game)
 
 document.querySelector<HTMLDivElement>('#app')!.innerHTML = `
-  <main x-data="$store.game" x-init="setup($store.game)" class="grid grid-cols-[auto] grid-rows-[160px_auto_70px_150px] h-screen no-select md:grid-cols-[400px_1fr] md:grid-rows-[150px_50px_1fr_150px]">
-    <section class="flex-[0_100px] backgrounded px-3 py-8 row-1 balance-box blue-bottom md:col-span-2 md:row-1">
+  <main x-data="$store.game" x-init="setup($store.game)" class="grid grid-cols-[auto] grid-rows-[160px_auto_70px_150px] h-screen no-select md:grid-cols-[400px_1fr] md:grid-rows-[150px_50px_1fr_150px] relative">
+    <canvas id="smiley-canvas" class="absolute w-full h-full z-10"></canvas>
+    <section class="flex-[0_100px] backgrounded px-3 py-8 row-1 balance-box blue-bottom md:col-span-2 md:row-1 relative z-20">
       <h1 x-text="display.humanNumber(balances.balance)" class="font-mono text-[30px] text-white text-center my-2"></h1>
       <p class="text-center text-white">
         <span x-text="producers.displayOverallProductivity"></span>
         <span class="text-[10px] align-top">EPS</span>
       </p>
     </section>
-    <section class="manual-box reverse-backgrounded row-4 flex justify-center items-center md:row-4 md:col-span-2 md-blue-top">
+    <section class="manual-box reverse-backgrounded row-4 flex justify-center items-center md:row-4 md:col-span-2 md-blue-top relative z-20">
       <button @click="work()" id="work"><span>🙂</span></button>
     </section>
-    <section class="flex flex-row reverse-backgrounded row-3 col-1 store-modes md:row-2 md:col-1 md:col-span-3">
+    <section class="flex flex-row reverse-backgrounded row-3 col-1 store-modes md:row-2 md:col-1 md:col-span-3 relative z-20">
       <div class="hidden md:flex md:flex-[0_400px] blue-bottom flex-row text-xs text-white flex-1 gap-2 items-center px-3">
         <p class="flex-[0_25px]"></p>
         <p class="flex-1 text-left">Total%</p>
@@ -196,7 +230,7 @@ document.querySelector<HTMLDivElement>('#app')!.innerHTML = `
         Stats
       </button>
     </section>
-    <div class="flex flex-col backgrounded grid-row-2 store-box overflow-scroll text-white row-2 md:row-3 md:col-1 md:col-span-3 md:grid md:grid-rows-[80px_1fr] md:grid-cols-[400px_1fr]">
+    <div class="flex flex-col backgrounded grid-row-2 store-box overflow-scroll text-white row-2 md:row-3 md:col-1 md:col-span-3 md:grid md:grid-rows-[80px_1fr] md:grid-cols-[400px_1fr] relative z-20">
       <div class="flex gap-2 flex-col backgrounded grid-row-2 store-box text-white row-2 md:row-2 md:col-1 md:flex-[400px_0] show-mobile md:row-span-2 md:col-1 border-r-1 border-sky-950" :class="{'active':storeMode === 'history'}">
         <template x-for="producer in producers.availableProducers">
           <div class="flex flex-row gap-2 w-full px-3 py-2 border-b-1 border-sky-950 text-sm">
@@ -251,3 +285,5 @@ document.querySelector<HTMLDivElement>('#app')!.innerHTML = `
     </div>
   </main>
 `
+
+const smileyCanvas = document.getElementById('smiley-canvas')

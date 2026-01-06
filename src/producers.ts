@@ -1,4 +1,5 @@
 import type { Game } from "./game";
+import { Multipliers } from "./multipliers";
 import type { Producer } from "./producer";
 import type { Score } from "./score";
 
@@ -13,6 +14,7 @@ export class Producers {
   private _epmsStats: Record<string, number> = {}
   private _epsStats: Record<string, number> = {}
   private _earnedStats: Record<string, number> = {}
+  private _multipliers: Multipliers = new Multipliers()
   private producers: Producer[] = []
 
   constructor(nullProducer: Producer, score: Score) {
@@ -24,6 +26,10 @@ export class Producers {
 
   all() {
     return this.producers
+  }
+
+  increase(id: string, rate: number) {
+    this._multipliers.add(id, (_game: Game, _producers: Producers, baseValue: number) => rate)
   }
 
   get overallProductivityMS(): number {
@@ -68,7 +74,9 @@ export class Producers {
       if (window.DEBUG) console.log(`${producer.name} -> ${eps} (${this._epmsStats[producer.name]} / ms)`)
     })
 
-    this.overallProductivity = Object.values(this._epsStats).reduce((sum, val) => sum + val, 0)
+    const producersValue = Object.values(this._epsStats).reduce((sum, val) => sum + val, 0)
+    const report = this._multipliers.calculate(game, this, 1)
+    this.overallProductivity = producersValue * report.total
   }
 
   advance(byTime: number) {
