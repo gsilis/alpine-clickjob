@@ -1,6 +1,13 @@
-import type { Coordinate } from "./coordinate";
+import { Coordinate } from "./coordinate";
 
 export class Rectangle {
+  static fromDimensions(x: number, y: number, width: number, height: number) {
+    const a = Coordinate.from(x, y)
+    const b = Coordinate.from(x + width, y + width)
+
+    return new Rectangle(a, b)
+  }
+
   private a: Coordinate
   private b: Coordinate
 

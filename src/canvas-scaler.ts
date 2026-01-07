@@ -1,27 +1,27 @@
+import { FriendlyResizeObserver } from "./friendly-resize-observer"
+import type { Rectangle } from "./rectangle"
+
 export class CanvasScaler {
   static fromCanvas(canvas: HTMLCanvasElement) {
     return new CanvasScaler(canvas)
   }
 
   private _canvas: HTMLCanvasElement
-  private _parent?: HTMLElement
-  private _observer: ResizeObserver
+  private _observer: FriendlyResizeObserver
 
   constructor(canvas: HTMLCanvasElement) {
     this._canvas = canvas
-    this._observer = new ResizeObserver(this.onResize.bind(this))
 
     if (!this._canvas.parentElement) {
       throw new Error('Canvas element should have a parent element that can be observed.')
     }
 
-    this._parent = this._canvas.parentElement
-    this._observer.observe(this._parent)
+    this._observer = new FriendlyResizeObserver(this._canvas.parentElement)
+    this._observer.listen(this.onResize.bind(this))
   }
 
-  private onResize() {
-    if (!this._parent) return
-    this._canvas.width = this._parent.clientWidth
-    this._canvas.height = this._parent.clientHeight
+  private onResize(dimensions: Rectangle) {
+    this._canvas.width = dimensions.width
+    this._canvas.height = dimensions.height
   }
 }

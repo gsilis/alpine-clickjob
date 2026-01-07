@@ -219,10 +219,10 @@ document.querySelector<HTMLDivElement>('#app')!.innerHTML = `
         <p class="flex-1 text-right">Total</p>
         <p class="flex-1 text-right">EPS</p>
       </div>
-      <button class="flex-1 md:flex-0 md:px-4 text-sky-400 cursor-pointer no-touch" :class="{'active': storeMode === 'purchases'}" @click="storeMode = 'purchases'">
+      <button class="flex-1 md:flex-0 md:px-6 text-sky-400 cursor-pointer no-touch" :class="{'active': storeMode === 'purchases'}" @click="storeMode = 'purchases'">
         Producers
       </button>
-      <button class="flex-1 md:flex-0 md:px-4 text-sky-400 cursor-pointer no-touch text-nowrap" :class="{'active': storeMode === 'upgrades'}" @click="storeMode = 'upgrades'">
+      <button class="flex-1 md:flex-0 md:px-6 text-sky-400 cursor-pointer no-touch text-nowrap" :class="{'active': storeMode === 'upgrades'}" @click="storeMode = 'upgrades'">
         Upgrades
         <span x-text="availableUpgrades" x-show="availableUpgrades > 0" class="ml-2 text-white bg-red-500 px-2 py-1 rounded-xl font-bold"></span>
       </button>
@@ -253,16 +253,19 @@ document.querySelector<HTMLDivElement>('#app')!.innerHTML = `
         </div>
         <div class="flex flex-row gap-2 w-full px-3 py-2 border-b-1 border-sky-950 text-sm">
           <p class="flex-[0_25px] h-[25px] border-3 rounded-sm border-amber-500"></p>
-          <p class="flex-1 text-right font-mono" x-text="display.humanShortAbbreviatedNumber(score.scoreFor('manual'))"></p>
-          <p class="flex-1 text-right" x-text="display.humanAbbreviatedNumber(score.scoreFor('clicks'))"></p>
+          <p class="flex-1 text-right font-mono" x-text="display.humanAbbreviatedNumber(score.scoreFor('manual'))"></p>
+          <p class="flex-1 text-right font-mono" x-text="display.humanAbbreviatedNumber(score.scoreFor('clicks'))"></p>
         </div>
-        <div class="hidden md:flex md:flex-0 blue-bottom flex-row text-xs text-white flex-1 gap-2 items-center px-3 py-3 mt-5">
-          <p class="flex-[0_25px]"></p>
-          <p class="flex-2 text-right">All Time Created</p>
+        <div class="flex flex-row gap-2 w-full px-3 py-3 mt-6 blue-bottom text-xs">
+          <p class="flex-1 text-left">Stats</p>
         </div>
-        <div class="flex flex-row gap-2 w-full px-3 py-3">
-          <p class="flex-[0_25px] h-[25px] border-3 rounded-sm border-amber-500"></p>
-          <p class="flex-2 text-right" x-text="display.humanShortAbbreviatedNumber(balances.maxBalance)"></p>
+        <div class="flex flex-row gap-2 w-full px-3 py-3 border-b-1 border-sky-950 text-xs">
+          <p class="flex-1 text-left">All Time</p>
+          <p class="flex-3 text-right" x-text="display.humanShortAbbreviatedNumber(balances.maxBalance)"></p>
+        </div>
+        <div class="flex flex-row gap-2 w-full px-3 py-3 text-xs">
+          <p class="flex-1 text-left">Per Click</p>
+          <p class="flex-3 text-right" x-text="manualLabor"></p>
         </div>
       </div>
       <div class="flex flex-row p-3 gap-4 md:row-1 md:col-2" x-show="storeMode === 'purchases' && !producers.hasAvailableProducers">

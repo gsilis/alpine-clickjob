@@ -64,7 +64,7 @@ export class Display {
     const name = ABBREVIATIONS[offset] !== undefined ? ABBREVIATIONS[offset] : LAST_ABBREVIATION
     const display = formatter.format(num / divider)
 
-    return `${display} ${name}`
+    return `${display}${name}`
   }
 
   humanShortAbbreviatedNumber(num: number): string {
@@ -73,7 +73,7 @@ export class Display {
     const name = ABBREVIATIONS[offset] !== undefined ? ABBREVIATIONS[offset] : LAST_ABBREVIATION
     const display = shortFormatter.format(num / divider)
 
-    return `${display} ${name}`
+    return `${display}${name}`
   }
 
   percentFor(value: number) {

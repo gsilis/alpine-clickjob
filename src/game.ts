@@ -38,7 +38,7 @@ export class Game {
   private loop = new Loop()
   private config = new Config()
   private score = new Score()
-  private manualLabor = 1
+  private _manualLabor = 1
   private _manualLaborMultipliers = new Multipliers()
   private balances = new Balance()
   private unlockStorage = SafeValueFactory.stringCollection('game.unlocks', [])
@@ -109,7 +109,8 @@ export class Game {
     producer.quantity += quantity
     if (window.DEBUG) console.log(`%cPURCHASE ITEM%c %c${producer.name}`, Console.EVENT, Console.CLEAR, Console.ID)
 
-    this.calculateEPS(game)
+    game.calculateEPS(game)
+    game.producers.recalculate(game)
   }
 
   sell(game: Game, producer: Producer, quantity: number) {
@@ -117,7 +118,8 @@ export class Game {
     producer.quantity = Math.max(0, producer.quantity - quantity)
     if (window.DEBUG) console.log(`%cSELL ITEM%c %c${producer.name}`, Console.EVENT, Console.CLEAR, Console.ID)
 
-    this.calculateEPS(game)
+    game.calculateEPS(game)
+    game.producers.recalculate(game)
     game.balances.earn(price)
   }
 
@@ -127,10 +129,11 @@ export class Game {
     game.balances.spend(price)
     upgrade.available = false
     upgrade.install(game, game.producers)
-    this.purchases.add(upgrade.id)
+    game.purchases.add(upgrade.id)
 
     if (window.DEBUG) console.log(`%cPURCHASE UPGRADE%c %c${upgrade.id}`, Console.EVENT, Console.CLEAR, Console.ID)
-    this.calculateEPS(game)
+    game.calculateEPS(game)
+    game.producers.recalculate(game)
   }
 
   erase() {
@@ -149,6 +152,10 @@ export class Game {
   restart() {
     this.pause()
     this.erase()
+  }
+
+  get manualLabor() {
+    return this._manualLabor
   }
 
   get smileys() {
@@ -198,7 +205,7 @@ export class Game {
 
   private calculateEPS(game: Game) {
     if (window.DEBUG) console.group('Calculating EPS...')
-    game.manualLabor = this._manualLaborMultipliers.calculate(game, game.producers, 1).total
+    game._manualLabor = this._manualLaborMultipliers.calculate(game, game.producers, 1).total
     game.producers.recalculate(game)
     if (window.DEBUG) console.groupEnd()
   }
