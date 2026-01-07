@@ -7,6 +7,7 @@ import { UnlockStateFactory } from './unlock-state-factory'
 import type { Unlock, UnlockGameStateProcessor } from './unlocks'
 import type { Producers } from './producers'
 import { SMILEYS } from './smileys'
+import { CanvasScaler } from './canvas-scaler'
 
 const productPriceProgression = new Progression(15, 11)
 const PRODUCTS: Product[] = [
@@ -238,10 +239,31 @@ document.querySelector<HTMLDivElement>('#app')!.innerHTML = `
         <template x-for="producer in producers.availableProducers">
           <div class="flex flex-row gap-2 w-full px-3 py-2 border-b-1 border-sky-950 text-sm">
             <p class="flex-[0_25px] h-[25px] border-3 rounded-sm border-amber-500"></p>
-            <p class="flex-1 text-right font-mono" x-text="display.humanAbbreviatedNumber(score.scoreFor(producer.name))"></p>
+            <p class="flex-1 text-right font-mono" x-text="display.humanShortAbbreviatedNumber(score.scoreFor(producer.name))"></p>
             <p class="flex-1 text-right" x-text="display.humanAbbreviatedNumber(producers.epsFor(producer.name))"></p>
           </div>
         </template>
+        <div class="flex flex-row gap-2 w-full px-3 py-2 text-sm border-sky-950 border-b-1 py-3" x-show="!producers.availableProducers.length">
+          No producers yet
+        </div>
+        <div class="hidden md:flex md:flex-0 blue-bottom flex-row text-xs text-white flex-1 gap-2 items-center px-3 py-3 mt-5">
+          <p class="flex-[0_25px]"></p>
+          <p class="flex-1 text-right">Manually Created</p>
+          <p class="flex-1 text-right">Clicks</p>
+        </div>
+        <div class="flex flex-row gap-2 w-full px-3 py-2 border-b-1 border-sky-950 text-sm">
+          <p class="flex-[0_25px] h-[25px] border-3 rounded-sm border-amber-500"></p>
+          <p class="flex-1 text-right font-mono" x-text="display.humanShortAbbreviatedNumber(score.scoreFor('manual'))"></p>
+          <p class="flex-1 text-right" x-text="display.humanAbbreviatedNumber(score.scoreFor('clicks'))"></p>
+        </div>
+        <div class="hidden md:flex md:flex-0 blue-bottom flex-row text-xs text-white flex-1 gap-2 items-center px-3 py-3 mt-5">
+          <p class="flex-[0_25px]"></p>
+          <p class="flex-2 text-right">All Time Created</p>
+        </div>
+        <div class="flex flex-row gap-2 w-full px-3 py-3">
+          <p class="flex-[0_25px] h-[25px] border-3 rounded-sm border-amber-500"></p>
+          <p class="flex-2 text-right" x-text="display.humanShortAbbreviatedNumber(balances.maxBalance)"></p>
+        </div>
       </div>
       <div class="flex flex-row p-3 gap-4 md:row-1 md:col-2" x-show="storeMode === 'purchases' && !producers.hasAvailableProducers">
         <p class="flex-1">No available producers yet</p>
@@ -284,4 +306,6 @@ document.querySelector<HTMLDivElement>('#app')!.innerHTML = `
   </main>
 `
 
-const smileyCanvas = document.getElementById('smiley-canvas')
+const smileyCanvas = document.getElementById('smiley-canvas') as HTMLCanvasElement
+if (!smileyCanvas) throw new Error('Could not find canvas')
+CanvasScaler.fromCanvas(smileyCanvas)

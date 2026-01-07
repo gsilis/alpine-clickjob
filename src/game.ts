@@ -92,6 +92,7 @@ export class Game {
     const amount = this.manualLabor
 
     this.score.record('manual', amount)
+    this.score.record('clicks', 1)
     this.balances.earn(amount)
     this.frameClicks += 1
   }

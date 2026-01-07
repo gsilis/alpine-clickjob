@@ -46,6 +46,7 @@ const NAMES = [
 ]
 const LAST_NAME = NAMES[NAMES.length - 1]
 const formatter = new Intl.NumberFormat('en-us', { maximumFractionDigits: 2, minimumFractionDigits: 0 })
+const shortFormatter = new Intl.NumberFormat('en-us', { maximumFractionDigits: 0 })
 
 export class Display {
   humanNumber(num: number): string {
@@ -62,6 +63,15 @@ export class Display {
     const divider = NUMBERS[offset] !== undefined ? NUMBERS[offset] : LAST_NUMBER
     const name = ABBREVIATIONS[offset] !== undefined ? ABBREVIATIONS[offset] : LAST_ABBREVIATION
     const display = formatter.format(num / divider)
+
+    return `${display} ${name}`
+  }
+
+  humanShortAbbreviatedNumber(num: number): string {
+    const offset = this.offsetFor(num)
+    const divider = NUMBERS[offset] !== undefined ? NUMBERS[offset] : LAST_NUMBER
+    const name = ABBREVIATIONS[offset] !== undefined ? ABBREVIATIONS[offset] : LAST_ABBREVIATION
+    const display = shortFormatter.format(num / divider)
 
     return `${display} ${name}`
   }
