@@ -215,7 +215,6 @@ document.querySelector<HTMLDivElement>('#app')!.innerHTML = `
     <section class="flex flex-row reverse-backgrounded row-3 col-1 store-modes md:row-2 md:col-1 md:col-span-3 relative z-20">
       <div class="hidden md:flex md:flex-[0_400px] blue-bottom flex-row text-xs text-white flex-1 gap-2 items-center px-3">
         <p class="flex-[0_25px]"></p>
-        <p class="flex-1 text-left">Total%</p>
         <p class="flex-1 text-right">Total</p>
         <p class="flex-1 text-right">EPS</p>
       </div>
@@ -229,26 +228,25 @@ document.querySelector<HTMLDivElement>('#app')!.innerHTML = `
       <button class="flex-1 text-sky-400 cursot-pointer no-touch md:hidden" :class="{'active': storeMode === 'history'}" @click="storeMode = 'history'">
         Stats
       </button>
+      <div x-show="storeMode === 'purchases'" class="flex-1 justify-end items-center flex gap-3 px-3">
+        <button class="uppercase flex-[0_50px] cursor-pointer store-mode px-2 py-1 rounded-xl" x-bind:disabled="storeTransactMode === 'store-buy'" @click="storeTransactMode = 'store-buy'" x-show="producers.hasAvailableProducers">Buy</button>
+        <button class="uppercase flex-[0_50px] cursor-pointer store-mode px-2 py-1 rounded-xl" x-bind:disabled="storeTransactMode === 'store-sell'" @click="storeTransactMode = 'store-sell'" x-show="producers.hasAvailableProducers">Sell</button>
+      </div>
     </section>
-    <div class="flex flex-col backgrounded grid-row-2 store-box overflow-scroll text-white row-2 md:row-3 md:col-1 md:col-span-3 md:grid md:grid-rows-[80px_1fr] md:grid-cols-[400px_1fr] relative z-20">
-      <div class="flex gap-2 flex-col backgrounded grid-row-2 store-box text-white row-2 md:row-2 md:col-1 md:flex-[400px_0] show-mobile md:row-span-2 md:col-1 border-r-1 border-sky-950" :class="{'active':storeMode === 'history'}">
+    <div class="flex flex-col backgrounded grid-row-2 store-box text-white row-2 md:row-3 md:col-1 md:col-span-3 md:grid md:grid-rows-[80px_1fr] md:grid-cols-[400px_1fr] relative z-20 overflow-hidden">
+      <div class="flex gap-2 flex-col backgrounded grid-row-2 store-box text-white row-2 md:row-2 md:col-1 md:flex-[400px_0] show-mobile md:row-span-2 md:col-1 border-r-1 border-sky-950 overflow-scroll" :class="{'active':storeMode === 'history'}">
         <template x-for="producer in producers.availableProducers">
           <div class="flex flex-row gap-2 w-full px-3 py-2 border-b-1 border-sky-950 text-sm">
             <p class="flex-[0_25px] h-[25px] border-3 rounded-sm border-amber-500"></p>
-            <p class="flex-1 text-left" x-text="display.percentFor(score.percentageFor(score.scoreFor(producer.name), balances.maxBalance))"></p>
             <p class="flex-1 text-right font-mono" x-text="display.humanAbbreviatedNumber(score.scoreFor(producer.name))"></p>
             <p class="flex-1 text-right" x-text="display.humanAbbreviatedNumber(producers.epsFor(producer.name))"></p>
           </div>
         </template>
       </div>
-      <div class="flex flex-row p-3 gap-4 md:row-1 md:col-2" x-show="storeMode === 'purchases'">
-        <p class="flex-1">
-          <span x-show="!producers.hasAvailableProducers">No available producers yet</span>
-        </p>
-        <button class="uppercase flex-[0_50px] cursor-pointer store-mode p-2 rounded-xl" x-bind:disabled="storeTransactMode === 'store-buy'" @click="storeTransactMode = 'store-buy'" x-show="producers.hasAvailableProducers">Buy</button>
-        <button class="uppercase flex-[0_50px] cursor-pointer store-mode p-2 rounded-xl" x-bind:disabled="storeTransactMode === 'store-sell'" @click="storeTransactMode = 'store-sell'" x-show="producers.hasAvailableProducers">Sell</button>
+      <div class="flex flex-row p-3 gap-4 md:row-1 md:col-2" x-show="storeMode === 'purchases' && !producers.hasAvailableProducers">
+        <p class="flex-1">No available producers yet</p>
       </div>
-      <div class="flex flex-col md:row-2 md:col-2" x-show="storeMode === 'purchases'">
+      <div class="flex flex-col md:row-1 md:row-span-3 md:col-2 overflow-scroll" x-show="storeMode === 'purchases'">
         <template x-for="producer in producers.producers">
           <section x-data="producer" x-show="producer.revealed" class="grid grid-rows-3 grid-cols-[50px_1fr_50px_50px] my-2 px-3 gap-x-4 gap-y-0" :class="{ 'unavailable-item' : price > balance }">
             <div class="w-[50px] h-[50px] row-1 col-1 row-span-4 border-3 rounded-xl border-amber-500"></div>
