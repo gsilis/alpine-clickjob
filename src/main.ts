@@ -92,8 +92,8 @@ const UPGRADES: Upgrade[] = [
     unlockAt: 10000,
     install: (game: Game, _producers: Producers) => {
       game.addManualLaborMultiplier('turbo-mouse', (_game: Game, producers: Producers) => {
-        const macros = Math.floor(producers.find('ad-overlays').quantity / 3)
-        return macros
+        const items = Math.floor(producers.find('ad-overlays').quantity / 3)
+        return items
       })
     }
   },
@@ -105,8 +105,8 @@ const UPGRADES: Upgrade[] = [
     unlockAt: 9900,
     install: (game: Game, _producers: Producers) => {
       game.addManualLaborMultiplier('super-turbo-mouse', (_game: Game, producers: Producers) => {
-        const macro = Math.floor(producers.find('ad-overlays').quantity / 6)
-        return macro * 3
+        const items = Math.floor(producers.find('ad-overlays').quantity / 6)
+        return items * 3
       })
     }
   }
