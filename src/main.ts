@@ -12,7 +12,7 @@ import { Renderer } from './renderer'
 import { Rectangle } from './rectangle'
 import { FriendlyResizeObserver } from './friendly-resize-observer'
 import { Coordinate } from './coordinate'
-import ManualClickIcon from '../designs/manual-clicks.svg'
+import ManualClickIcon from './images/manual-clicks.svg'
 import { PRODUCTS } from './config/products'
 
 const Icons = {

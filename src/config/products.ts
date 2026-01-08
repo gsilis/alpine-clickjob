@@ -1,10 +1,10 @@
 import { Progression } from "../progression"
 import { type Product } from '../game'
-import AdOverlayIcon from '../../designs/ad-overlays.svg'
-import InfluencerIcon from '../../designs/influencers.svg'
-import SkipAdIcon from '../../designs/skip-ads.svg'
-import EspressoIcon from '../../designs/expresso.svg'
-import RageBaitIcon from '../../designs/rage-bait.svg'
+import AdOverlayIcon from '../images/ad-overlays.svg'
+import InfluencerIcon from '../images/influencers.svg'
+import SkipAdIcon from '../images/skip-ads.svg'
+import EspressoIcon from '../images/expresso.svg'
+import RageBaitIcon from '../images/rage-bait.svg'
 
 const productPriceProgression = new Progression(15, 11)
 const productivityProgression = new Progression(0.1, 5)

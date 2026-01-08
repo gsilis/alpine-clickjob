@@ -29,7 +29,7 @@ export class Producers {
   }
 
   increase(id: string, rate: number) {
-    this._multipliers.add(id, (_game: Game, _producers: Producers, baseValue: number) => rate)
+    this._multipliers.add(id, (_game: Game, _producers: Producers, _baseValue: number) => rate)
   }
 
   get overallProductivityMS(): number {
