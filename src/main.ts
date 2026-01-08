@@ -173,16 +173,16 @@ Alpine.store('game', window.game)
 Alpine.store('icons', Icons)
 
 document.querySelector<HTMLDivElement>('#app')!.innerHTML = `
-  <main x-data="$store.game" x-init="setup($store.game)" class="grid grid-cols-[auto] grid-rows-[160px_auto_70px_150px] h-screen no-select md:grid-cols-[400px_1fr] md:grid-rows-[150px_50px_1fr_150px] relative overflow-hidden backgrounded">
+  <main x-data="$store.game" x-init="setup($store.game)" class="grid grid-cols-[auto] grid-rows-[100px_auto_70px_150px] h-screen no-select md:grid-cols-[400px_1fr] md:grid-rows-[150px_50px_1fr_150px] relative overflow-hidden backgrounded">
     <canvas id="smiley-canvas" class="absolute w-full h-full z-10"></canvas>
-    <section class="flex-[0_100px] px-3 py-8 row-1 balance-box blue-bottom md:col-span-2 md:row-1 relative z-20">
+    <section class="flex-[0_100px] px-3 md:py-8 row-1 balance-box blue-bottom md:col-span-2 md:row-1 relative z-20">
       <h1 x-text="display.humanNumber(balances.balance)" class="font-mono text-[30px] text-white text-center my-2"></h1>
       <p class="text-center text-white">
         <span x-text="producers.displayOverallProductivity"></span>
         <span class="text-[10px] align-top">EPS</span>
       </p>
     </section>
-    <section class="manual-box row-4 flex justify-center items-center md:row-4 md:col-span-2 md-blue-top relative z-80">
+    <section class="manual-box row-4 flex justify-center items-center md:row-4 md:col-span-2 md-blue-top relative z-80 no-touch">
       <button @click="work()" @mousedown="mousedown()" id="work"><span x-text="character"></span></button>
     </section>
     <section class="flex flex-row row-3 col-1 store-modes md:row-2 md:col-1 md:col-span-3 relative z-20">
@@ -201,13 +201,13 @@ document.querySelector<HTMLDivElement>('#app')!.innerHTML = `
       <button class="flex-1 text-sky-400 cursot-pointer no-touch md:hidden" :class="{'active': storeMode === 'history'}" @click="storeMode = 'history'">
         Stats
       </button>
-      <div x-show="storeMode === 'purchases'" class="flex-1 justify-end items-center flex gap-3 px-3">
+      <div x-show="storeMode === 'purchases'" class="flex-1 justify-end items-center flex gap-3 px-3 hidden md:flex">
         <button class="uppercase flex-[0_50px] cursor-pointer store-mode px-2 py-1 rounded-xl" x-bind:disabled="storeTransactMode === 'store-buy'" @click="storeTransactMode = 'store-buy'" x-show="producers.hasAvailableProducers">Buy</button>
         <button class="uppercase flex-[0_50px] cursor-pointer store-mode px-2 py-1 rounded-xl" x-bind:disabled="storeTransactMode === 'store-sell'" @click="storeTransactMode = 'store-sell'" x-show="producers.hasAvailableProducers">Sell</button>
       </div>
     </section>
     <div class="flex flex-col grid-row-2 store-box text-white row-2 md:row-3 md:col-1 md:col-span-3 md:grid md:grid-rows-[80px_1fr] md:grid-cols-[400px_1fr] relative z-20 overflow-hidden">
-      <div class="flex gap-2 flex-col backgrounded grid-row-2 store-box text-white row-2 md:row-2 md:col-1 md:flex-[400px_0] show-mobile md:row-span-2 md:col-1 border-r-1 border-sky-950 overflow-scroll no-scrollbars" :class="{'active':storeMode === 'history'}">
+      <div class="flex gap-2 flex-col grid-row-2 store-box text-white row-2 md:row-2 md:col-1 md:flex-[400px_0] show-mobile md:row-span-2 md:col-1 border-r-1 border-sky-950 overflow-scroll no-scrollbars" :class="{'active':storeMode === 'history'}">
         <template x-for="producer in producers.availableProducers">
           <div class="flex flex-row gap-2 w-full px-3 py-2 border-b-1 border-sky-950 text-sm">
             <p class="flex-[0_25px] h-[25px] border-1 rounded-sm border-amber-500 overflow-hidden">
