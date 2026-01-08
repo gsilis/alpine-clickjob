@@ -175,11 +175,12 @@ Alpine.store('icons', Icons)
 document.querySelector<HTMLDivElement>('#app')!.innerHTML = `
   <main x-data="$store.game" x-init="setup($store.game)" class="grid grid-cols-[auto] grid-rows-[100px_auto_70px_150px] h-screen no-select md:grid-cols-[400px_1fr] md:grid-rows-[150px_50px_1fr_150px] relative overflow-hidden backgrounded">
     <canvas id="smiley-canvas" class="absolute w-full h-full z-10"></canvas>
-    <section class="flex-[0_100px] px-3 md:py-8 row-1 balance-box blue-bottom md:col-span-2 md:row-1 relative z-20">
-      <h1 x-text="display.humanNumber(balances.balance)" class="font-mono text-[30px] text-white text-center my-2"></h1>
-      <p class="text-center text-white">
+    <section class="flex-[0_100px] px-3 py-4 md:py-8 row-1 balance-box blue-bottom md:col-span-2 md:row-1 relative z-20">
+      <h1 x-text="display.humanNumber(balances.balance)" class="font-mono text-[30px] text-white text-center my-2 hidden md:block"></h1>
+      <h1 x-text="balances.displayBalance" class="font-mono text-[16px] text-white text-right my-2 md:hidden"></h1>
+      <p class="text-right md:text-center text-white text-[11px] md:text-[15px]">
         <span x-text="producers.displayOverallProductivity"></span>
-        <span class="text-[10px] align-top">EPS</span>
+        <span class="text-[0.9em] align-top">EPS</span>
       </p>
     </section>
     <section class="manual-box row-4 flex justify-center items-center md:row-4 md:col-span-2 md-blue-top relative z-80 no-touch">
