@@ -10,8 +10,8 @@ export class ProducerFactory {
     this._sell = sell
   }
 
-  create(name: string, title: string, basePrice: number, defaultProductivity: number): Producer {
-    const producer = new Producer(this._price, this._sell, name, title, basePrice, defaultProductivity)
+  create(name: string, title: string, description: string, basePrice: number, defaultProductivity: number, icon: string): Producer {
+    const producer = new Producer(this._price, this._sell, name, title, description, basePrice, defaultProductivity, icon)
     return producer
   }
 }

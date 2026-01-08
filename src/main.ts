@@ -9,62 +9,15 @@ import type { Producers } from './producers'
 import { SMILEYS } from './smileys'
 import { CanvasScaler } from './canvas-scaler'
 import { Renderer } from './renderer'
-import { Helper, SmileyEmitter } from './smiley-emitter'
 import { Rectangle } from './rectangle'
 import { FriendlyResizeObserver } from './friendly-resize-observer'
 import { Coordinate } from './coordinate'
+import ManualClickIcon from '../designs/manual-clicks.svg'
+import { PRODUCTS } from './config/products'
 
-const productPriceProgression = new Progression(15, 11)
-const PRODUCTS: Product[] = [
-  {
-    id: 'macro', title: 'Macros',
-    basePrice: productPriceProgression.next(),
-    baseProductivity: 0.1,
-    description: `
-      Run a macro to click the button for you.
-    `,
-   },
-   {
-    id: 'scroll-wheel', title: 'Scroll Wheels',
-    basePrice: productPriceProgression.next(),
-    baseProductivity: 1,
-    description: `
-      You've bound your mouse wheel rotations to a left click using a program you downloaded from Totally Legitemate Corp™.
-    `
-   },
-   {
-    id: 'extra-hand', title: 'Extra Hands',
-    basePrice: productPriceProgression.next(),
-    baseProductivity: 3,
-    description: `
-      Click using both arms. Of course you need to invest in a new kind of mouse to do this, that's why it's so expensive.
-    `
-   },
-   {
-    id: 'ad-platform-server', title: 'Ad Platform Servers',
-    basePrice: productPriceProgression.next(),
-    baseProductivity: 50,
-    description: `
-      Why click on the button yourself? You've created an ad platform that directs other peoples' clicks to your button.
-    `
-  },
-  {
-    id: 'foot-pedal', title: 'Foot Pedals',
-    basePrice: productPriceProgression.next(),
-    baseProductivity: 125,
-    description: `
-      Don't let your other limbs go to waste, let them generate clicks too! Having learned your lessons from Ambidexterity, this is a set of two pedals, rather than just one.
-    `
-  },
-  {
-    id: 'metronome', title: 'Metronomes',
-    basePrice: productPriceProgression.next(),
-    baseProductivity: 230,
-    description: `
-      Swings back and forth to click the button.
-    `
-  }
-]
+const Icons = {
+  manualClicks: ManualClickIcon
+}
 
 const smileyPriceProgression = new Progression(1000000, 2)
 const UPGRADES: Upgrade[] = [
@@ -150,7 +103,7 @@ const UPGRADES: Upgrade[] = [
     effectDescription: `Gain 3 EPS for every 6 macros you own.`,
     price: 10000,
     unlockAt: 9900,
-    install: (game: Game, producers: Producers) => {
+    install: (game: Game, _producers: Producers) => {
       game.addManualLaborMultiplier('super-turbo-mouse', (_game: Game, producers: Producers) => {
         const macro = Math.floor(producers.find('macro').quantity / 6)
         return macro * 3
@@ -217,6 +170,7 @@ window.game = game
 Alpine.start()
 
 Alpine.store('game', window.game)
+Alpine.store('icons', Icons)
 
 document.querySelector<HTMLDivElement>('#app')!.innerHTML = `
   <main x-data="$store.game" x-init="setup($store.game)" class="grid grid-cols-[auto] grid-rows-[160px_auto_70px_150px] h-screen no-select md:grid-cols-[400px_1fr] md:grid-rows-[150px_50px_1fr_150px] relative overflow-hidden backgrounded">
@@ -253,10 +207,12 @@ document.querySelector<HTMLDivElement>('#app')!.innerHTML = `
       </div>
     </section>
     <div class="flex flex-col grid-row-2 store-box text-white row-2 md:row-3 md:col-1 md:col-span-3 md:grid md:grid-rows-[80px_1fr] md:grid-cols-[400px_1fr] relative z-20 overflow-hidden">
-      <div class="flex gap-2 flex-col backgrounded grid-row-2 store-box text-white row-2 md:row-2 md:col-1 md:flex-[400px_0] show-mobile md:row-span-2 md:col-1 border-r-1 border-sky-950 overflow-scroll" :class="{'active':storeMode === 'history'}">
+      <div class="flex gap-2 flex-col backgrounded grid-row-2 store-box text-white row-2 md:row-2 md:col-1 md:flex-[400px_0] show-mobile md:row-span-2 md:col-1 border-r-1 border-sky-950 overflow-scroll no-scrollbars" :class="{'active':storeMode === 'history'}">
         <template x-for="producer in producers.availableProducers">
           <div class="flex flex-row gap-2 w-full px-3 py-2 border-b-1 border-sky-950 text-sm">
-            <p class="flex-[0_25px] h-[25px] border-3 rounded-sm border-amber-500"></p>
+            <p class="flex-[0_25px] h-[25px] border-1 rounded-sm border-amber-500 overflow-hidden">
+              <img x-bind:src="producer.iconSrc" x-show="producer.iconSrc" class="w-full h-full" />
+            </p>
             <p class="flex-1 text-right font-mono" x-text="display.humanShortAbbreviatedNumber(score.scoreFor(producer.name))"></p>
             <p class="flex-1 text-right" x-text="display.humanAbbreviatedNumber(producers.epsFor(producer.name))"></p>
           </div>
@@ -270,7 +226,9 @@ document.querySelector<HTMLDivElement>('#app')!.innerHTML = `
           <p class="flex-1 text-right">Clicks</p>
         </div>
         <div class="flex flex-row gap-2 w-full px-3 py-2 border-b-1 border-sky-950 text-sm">
-          <p class="flex-[0_25px] h-[25px] border-3 rounded-sm border-amber-500"></p>
+          <p class="flex-[0_25px] h-[25px] border-3 rounded-sm border-amber-500">
+            <img x-bind:src="$store.icons.manualClicks" class="w-full h-full" />
+          </p>
           <p class="flex-1 text-right font-mono" x-text="display.humanAbbreviatedNumber(score.scoreFor('manual'))"></p>
           <p class="flex-1 text-right font-mono" x-text="display.humanAbbreviatedNumber(score.scoreFor('clicks'))"></p>
         </div>
@@ -289,10 +247,12 @@ document.querySelector<HTMLDivElement>('#app')!.innerHTML = `
       <div class="flex flex-row p-3 gap-4 md:row-1 md:col-2" x-show="storeMode === 'purchases' && !producers.hasAvailableProducers">
         <p class="flex-1">No available producers yet</p>
       </div>
-      <div class="flex flex-col md:row-1 md:row-span-3 md:col-2 overflow-scroll" x-show="storeMode === 'purchases'">
+      <div class="flex flex-col md:row-1 md:row-span-3 md:col-2 overflow-scroll no-scrollbars" x-show="storeMode === 'purchases'">
         <template x-for="producer in producers.producers">
-          <section x-data="producer" x-show="producer.revealed" class="grid grid-rows-3 grid-cols-[50px_1fr_50px_50px] my-2 px-3 gap-x-4 gap-y-0" :class="{ 'unavailable-item' : price > balance }">
-            <div class="w-[50px] h-[50px] row-1 col-1 row-span-4 border-3 rounded-xl border-amber-500"></div>
+          <section x-data="producer" x-show="producer.revealed" class="grid grid-rows-[auto] grid-cols-[75px_1fr_50px_50px] my-2 px-3 gap-x-4 gap-y-0" :class="{ 'unavailable-item' : price > balance }">
+            <div class="w-[75px] h-[75px] row-1 col-1 row-span-4 border-3 rounded-xl border-amber-500 overflow-hidden">
+              <img x-bind:src="iconSrc" x-show="iconSrc" class="w-full h-full" />
+            </div>
             <p class="row-1 col-2 text-white">
               <span x-show="mysterious">????</span>
               <span x-show="available" x-text="title" class="text-nowrap text-ellipsis"></span>
@@ -306,10 +266,11 @@ document.querySelector<HTMLDivElement>('#app')!.innerHTML = `
             </p>
             <button @click="buy($store.game, producer, 1)" class="col-4 row-1 row-span-4 w-[50px] h-[50px] rounded-[10em] buy-button text-2xl cursor-pointer no-touch" x-show="storeTransactMode === 'store-buy'">🛒</button>
             <button @click="sell($store.game, producer, 1)" class="col-4 row-1 row-span-4 h-[50px] rounded-[10em] sell-button text-xs cursor-pointer no-touch" x-show="storeTransactMode === 'store-sell'">SELL</button>
+            <p x-text="description" class="row-4 col-2 text-sky-600"></p>
           </section>
         </template>
       </div>
-      <div class="flex flex-col store-box overflow-scroll text-white row-2 md:row-1 md:row-span-2 md:col-2" x-show="storeMode === 'upgrades'">
+      <div class="flex flex-col store-box overflow-scroll no-scrollbars text-white row-2 md:row-1 md:row-span-2 md:col-2" x-show="storeMode === 'upgrades'">
         <p x-show="availableUpgrades <= 0" class="p-3">
           No upgrades available yet.
         </p>

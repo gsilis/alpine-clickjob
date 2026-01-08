@@ -9,6 +9,7 @@ export class Producer {
   private _sellPercentage: SafeValue<number>
   private _name: string
   private _title: string
+  private _description: string
   private _basePrice: number
   private _quantity: SafeValue<number>
   private _productivity: number
@@ -16,19 +17,23 @@ export class Producer {
   private _revealed: SafeValue<number>
   private _available: SafeValue<number>
   private _multipliers: Multipliers
+  private _icon: string
 
   constructor(
     priceMultiplier: SafeValue<number>,
     sellPercentage: SafeValue<number>,
     name: string,
     title: string,
+    description: string,
     basePrice: number,
-    defaultProductivityPerSecond: number
+    defaultProductivityPerSecond: number,
+    icon: string
   ) {
     this._priceMultiplier = priceMultiplier
     this._sellPercentage = sellPercentage
     this._name = name
     this._title = title
+    this._description = description
     this._basePrice = basePrice
     this._productivity = defaultProductivityPerSecond
     this._cachedProductivity = this._productivity
@@ -36,6 +41,7 @@ export class Producer {
     this._revealed = new SafeValue(`${name}.revealed`, 0, parseInt)
     this._available = new SafeValue(`${name}.available`, 0, parseInt)
     this._multipliers = new Multipliers()
+    this._icon = icon
   }
 
   get name(): string {
@@ -44,6 +50,10 @@ export class Producer {
 
   get title():string {
     return this._title
+  }
+
+  get description() {
+    return this._description
   }
 
   get basePrice(): number {
@@ -88,6 +98,10 @@ export class Producer {
 
   get displayPrice(): string {
     return this.priceFormatter.format(Math.ceil(this.price))
+  }
+
+  get iconSrc() {
+    return this._icon
   }
 
   boost(name: string, amount: number) {

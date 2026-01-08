@@ -24,7 +24,7 @@ const RUN_EVERY = 100// ms
 const EFFECT_EVERY = 3000// ms
 const priceFormatter = new Intl.NumberFormat('en-us', { maximumFractionDigits: 0 })
 
-export type Product = { id: string, title: string, description: string, basePrice: number, baseProductivity: number }
+export type Product = { id: string, title: string, description: string, basePrice: number, baseProductivity: number, iconSrc?: string, iconCharacter?: string }
 export type Upgrade = { id: string, title: string, description: string, effectDescription: string, price: number, unlockAt: number, productId?: string, install(game: Game, producers: Producers): void }
 export type StoredUpgrade = Upgrade & { available: boolean, displayPrice: string }
 
@@ -48,7 +48,7 @@ export class Game {
   private unlockStorage = SafeValueFactory.stringCollection('game.unlocks', [])
   private unlocks = new Unlocks(this.unlockStorage)
   private producerFactory = new ProducerFactory(this.config.priceMultiplier, this.config.sellPercentage)
-  private producers = new Producers(this.producerFactory.create('null', 'NULL', 0, 0), this.score)
+  private producers = new Producers(this.producerFactory.create('null', 'NULL', '', 0, 0, ''), this.score)
   private upgrades: StoredUpgrade[] = []
   private purchases = new Purchases(SafeValueFactory.stringCollection('game.purchases', []))
   private frameClicks: number = 0
@@ -65,8 +65,10 @@ export class Game {
       this.producers.add(this.producerFactory.create(
         product.id,
         product.title,
+        product.description,
         product.basePrice,
-        product.baseProductivity
+        product.baseProductivity,
+        product.iconSrc || product.iconCharacter || ''
       ))
     })
 

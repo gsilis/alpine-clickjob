@@ -65,6 +65,15 @@ button#work:active {
   --button-color: #1988ff;
 }
 
+.no-scrollbars {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+
+  &::-webkit-scroillbar {
+    display: none;
+  }
+}
+
 .backgrounded {
   background: linear-gradient(to top, var(--bg-gradient-from), var(--bg-gradient-to));
 }
