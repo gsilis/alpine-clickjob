@@ -19,7 +19,7 @@ const Icons = {
   manualClicks: ManualClickIcon
 }
 
-const smileyPriceProgression = new Progression(1000000, 2)
+const smileyPriceProgression = new Progression(10000, 1.7)
 const UPGRADES: Upgrade[] = [
   // These are based on quantity of each product
   ...(PRODUCTS.reduce<Upgrade[]>((acc: Upgrade[], product: Product) => {
@@ -87,12 +87,12 @@ const UPGRADES: Upgrade[] = [
   {
     id: 'turbo-mouse', title: 'Turbo Mouse',
     description: `Install a sick turbo on your computer mouse.`,
-    effectDescription: `Gain 1EPS for every 3 macros you own.`,
+    effectDescription: `Gain 1EPS for every 3 ad overlays you own.`,
     price: 5000,
     unlockAt: 10000,
     install: (game: Game, _producers: Producers) => {
       game.addManualLaborMultiplier('turbo-mouse', (_game: Game, producers: Producers) => {
-        const macros = Math.floor(producers.find('macro').quantity / 3)
+        const macros = Math.floor(producers.find('ad-overlays').quantity / 3)
         return macros
       })
     }
@@ -100,12 +100,12 @@ const UPGRADES: Upgrade[] = [
   {
     id: 'super-turbo-mouse', title: 'Super Turbo Mouse',
     description: `Pump up the jam on the turbo mouse`,
-    effectDescription: `Gain 3 EPS for every 6 macros you own.`,
+    effectDescription: `Gain 3 EPS for every 6 ad overlays you own.`,
     price: 10000,
     unlockAt: 9900,
     install: (game: Game, _producers: Producers) => {
       game.addManualLaborMultiplier('super-turbo-mouse', (_game: Game, producers: Producers) => {
-        const macro = Math.floor(producers.find('macro').quantity / 6)
+        const macro = Math.floor(producers.find('ad-overlays').quantity / 6)
         return macro * 3
       })
     }
