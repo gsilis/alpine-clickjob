@@ -45,7 +45,7 @@ const NAMES = [
   'Decillion'
 ]
 const LAST_NAME = NAMES[NAMES.length - 1]
-const formatter = new Intl.NumberFormat('en-us', { maximumFractionDigits: 2, minimumFractionDigits: 0 })
+const formatter = new Intl.NumberFormat('en-us', { maximumFractionDigits: 2, minimumFractionDigits: 2 })
 const shortFormatter = new Intl.NumberFormat('en-us', { maximumFractionDigits: 0 })
 
 export class Display {

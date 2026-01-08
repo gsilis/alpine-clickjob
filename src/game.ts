@@ -9,10 +9,13 @@ import type { Producer } from "./producer";
 import { ProducerFactory } from "./producer-factory";
 import { Producers } from "./producers";
 import { Purchases } from "./purchases";
+import { Rectangle } from "./rectangle";
+import type { Renderer } from "./renderer";
 import { SafeValueFactory } from "./safe-value-factory";
 import { SafeValueManager } from "./safe-value-manager";
 import { Score } from "./score";
-import { Smileys } from "./smileys";
+import { SmileyEmitter } from "./smiley-emitter";
+import { SMILEYS, Smileys } from "./smileys";
 import { Unlocks, type Unlock } from "./unlocks";
 
 // How often the update loop should run
@@ -32,6 +35,7 @@ type StoreMode = (typeof MODE_PURCHASES | typeof MODE_UPGRADES | typeof MODE_HIS
 export const STORE_MODE_BUY = 'store-buy'
 export const STORE_MODE_SELL = 'store-sell'
 type StoreTransactionMode = (typeof STORE_MODE_BUY | typeof STORE_MODE_SELL)
+const DEFAULT_CHARACTER = '🙂'
 
 export class Game {
   private __proxy?: Game;
@@ -51,6 +55,9 @@ export class Game {
   private _storeMode: StoreMode = MODE_PURCHASES
   private _storeTransactMode: StoreTransactionMode = STORE_MODE_BUY
   private _smileys: Smileys = new Smileys()
+  private _renderer?: Renderer
+  private _emitter?: SmileyEmitter
+  private character: string = DEFAULT_CHARACTER
   display = new Display()
 
   constructor(products: Product[], upgrades: Upgrade[], unlocks: Unlock[]) {
@@ -70,6 +77,8 @@ export class Game {
     unlocks.forEach((unlock) => {
       this.unlocks.register(unlock)
     })
+
+    this.smileys.unlock(SMILEYS[0].id)
   }
 
   /**
@@ -88,6 +97,13 @@ export class Game {
     if (window.DEBUG) console.groupEnd()
   }
 
+  setRenderer(renderer: Renderer, rectangle: Rectangle) {
+    if (this._renderer) this.loop.remove(this._renderer.onLoop)
+    this._renderer = renderer
+    this._emitter = new SmileyEmitter(this._renderer, rectangle)
+    this.loop.add(this._renderer.onLoop.bind(this._renderer))
+  }
+
   work() {
     const amount = this.manualLabor
 
@@ -95,6 +111,12 @@ export class Game {
     this.score.record('clicks', 1)
     this.balances.earn(amount)
     this.frameClicks += 1
+    this._emitter && this._emitter.emit(this.character)
+    this.character = DEFAULT_CHARACTER
+  }
+
+  mousedown() {
+    this.character = this.smileys.getRandom()
   }
 
   addManualLaborMultiplier(id: string, fn: MultiplierFunction) {

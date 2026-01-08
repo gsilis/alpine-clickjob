@@ -15,11 +15,16 @@ export class FriendlyResizeObserver {
 
   listen(handler: FriendlyResizeObserverHandler) {
     this._listeners.push(handler)
+    handler.apply(undefined, [this.dimensions()])
   }
 
   private onResize() {
-    const dimensions = Rectangle.fromDimensions(0, 0, this._dom.clientWidth, this._dom.clientHeight)
+    const dimensions = this.dimensions()
 
     this._listeners.forEach(l => l.apply(undefined, [dimensions]))
+  }
+
+  private dimensions() {
+    return Rectangle.fromDimensions(0, 0, this._dom.offsetWidth, this._dom.offsetHeight)
   }
 }

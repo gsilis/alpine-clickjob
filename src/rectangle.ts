@@ -3,7 +3,7 @@ import { Coordinate } from "./coordinate";
 export class Rectangle {
   static fromDimensions(x: number, y: number, width: number, height: number) {
     const a = Coordinate.from(x, y)
-    const b = Coordinate.from(x + width, y + width)
+    const b = Coordinate.from(x + width, y + height)
 
     return new Rectangle(a, b)
   }
@@ -30,11 +30,31 @@ export class Rectangle {
     return max - min
   }
 
+  get startx() {
+    return this.a.x
+  }
+
+  get starty() {
+    return this.a.y
+  }
+
+  get endx() {
+    return this.b.x
+  }
+
+  get endy() {
+    return this.b.y
+  }
+
   moveTo(point: Coordinate) {
     const width = this.width
     const height = this.height
 
     this.a.moveTo(point.x, point.y)
     this.b.moveTo(point.x + width, point.y + height)
+  }
+
+  toString() {
+    return `Rectangle(x=${this.startx}, y=${this.starty}, width=${this.width}, height=${this.height})`
   }
 }

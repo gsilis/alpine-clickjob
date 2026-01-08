@@ -1,5 +1,8 @@
+import { randomItemFrom } from "./random"
+
 export type SmileyConfig = { id: string, character: string, title: string, rate: number }
 export const SMILEYS: SmileyConfig[] = [
+  { character: "🙂", id: "default-face", title: "Default Face", rate: 0 },
   { character: "😀", id: "grinning-face", title: "Grinning Face", rate: 0.01 },
   { character: "😃", id: "grinning-face-with-big-eyes", title: "Grinning Face With Big Eyes", rate: 0.01 },
   { character: "😄", id: "grinning-face-with-smiling-eyes", title: "Grinning Face With Smiling Eyes", rate: 0.01 },
@@ -185,6 +188,7 @@ export class Smileys {
   }
 
   getRandom(): string {
-    return ''
+    const key = randomItemFrom(this._characters)
+    return SMILEYS.find(s => s.id === key)?.character || SMILEYS[0].character
   }
 }
